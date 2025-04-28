@@ -1,3 +1,5 @@
 /target
 .env
-server.crt
+/self_signed_cert
+
+
