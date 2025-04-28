@@ -1,5 +1,6 @@
-/target
+backend/target
+backend/self_signed_cert
+
 .env
-/self_signed_cert
 
 

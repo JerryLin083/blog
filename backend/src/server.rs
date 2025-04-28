@@ -1,6 +1,5 @@
-use std::{net::SocketAddr, path::PathBuf};
-
 use axum_server::tls_rustls::RustlsConfig;
+use std::{net::SocketAddr, path::PathBuf};
 
 use crate::{db::db_connection, router::router};
 
@@ -18,6 +17,8 @@ pub async fn run() {
     )
     .await
     .unwrap();
+
+    //TODO: redirect http to https
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 8000 as u16));
     tracing::info!("Listening on {}...", addr);
