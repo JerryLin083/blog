@@ -1,5 +1,40 @@
 mod get;
-pub use get::greeting;
+use chrono::DateTime;
+use chrono::Utc;
+pub use get::posts;
+pub use get::users;
 
 mod post;
-pub use post::err;
+pub use post::create_post;
+pub use post::create_user;
+
+mod patch;
+pub use patch::patch_post;
+pub use patch::patch_user;
+
+mod delete;
+pub use delete::delete_post;
+pub use delete::delete_user;
+
+use serde::{Deserialize, Serialize};
+
+#[derive(Serialize, Deserialize)]
+pub(crate) struct User {
+    user_id: i32,
+    first_name: String,
+    last_name: String,
+    email: String,
+    phone: String,
+    address: String,
+}
+
+#[derive(Serialize, Deserialize)]
+pub(crate) struct Post {
+    id: i32,
+    title: String,
+    content: String,
+    user_id: i32,
+    create_at: DateTime<Utc>,
+    update_at: DateTime<Utc>,
+    published_at: DateTime<Utc>,
+}
