@@ -1,6 +1,7 @@
+use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
+
 mod get;
-use chrono::DateTime;
-use chrono::Utc;
 pub use get::posts;
 pub use get::users;
 
@@ -16,11 +17,8 @@ mod delete;
 pub use delete::delete_post;
 pub use delete::delete_user;
 
-use serde::{Deserialize, Serialize};
-
-#[derive(Serialize, Deserialize)]
-pub(crate) struct User {
-    user_id: i32,
+#[derive(Deserialize)]
+pub(crate) struct UserRequest {
     first_name: String,
     last_name: String,
     email: String,
@@ -28,7 +26,24 @@ pub(crate) struct User {
     address: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize)]
+pub(crate) struct User {
+    id: i32,
+    first_name: String,
+    last_name: String,
+    email: String,
+    phone: String,
+    address: String,
+}
+
+#[derive(Deserialize)]
+pub(crate) struct PostRequest {
+    title: String,
+    content: String,
+    user_id: i32,
+}
+
+#[derive(Serialize)]
 pub(crate) struct Post {
     id: i32,
     title: String,

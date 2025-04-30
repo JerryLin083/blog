@@ -4,7 +4,11 @@ use sqlx::{PgPool, Result, Row};
 use super::{Post, User};
 
 pub async fn users(State(pool): State<PgPool>) -> Result<impl IntoResponse, (StatusCode, String)> {
-    let rows = sqlx::query("select * from users order by user_id limit 10")
+    //TODO: use limit and offset to get specific page(param page);
+
+    let query_str = "select * from users order by user_id limit 10";
+
+    let rows = sqlx::query(query_str)
         .fetch_all(&pool)
         .await
         .map_err(|err| (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()))?;
@@ -12,29 +16,31 @@ pub async fn users(State(pool): State<PgPool>) -> Result<impl IntoResponse, (Sta
     let users: Vec<User> = rows
         .into_iter()
         .map(|row| User {
-            user_id: row.get(0),
-            first_name: row.try_get(1).unwrap_or("".to_string()),
-            last_name: row.try_get(2).unwrap_or("".to_string()),
-            email: row.try_get(3).unwrap_or("".to_string()),
-            phone: row.try_get(4).unwrap_or("".to_string()),
-            address: row.try_get(5).unwrap_or("".to_string()),
+            id: row.get(0),
+            first_name: row.get(1),
+            last_name: row.get(2),
+            email: row.get(3),
+            phone: row.get(4),
+            address: row.get(5),
         })
         .collect();
 
-    Ok(Json(users))
+    Ok((StatusCode::OK, Json(users)))
 }
 
 pub async fn posts(State(pool): State<PgPool>) -> Result<impl IntoResponse, (StatusCode, String)> {
-    let rows = sqlx::query(
-        r#"
+    //TODO: use limit and offset to get specific page(param page);
+
+    let query_str = r#"
             select * from posts 
             where published_at is not null
             order by create_at desc limit 10 
-        "#,
-    )
-    .fetch_all(&pool)
-    .await
-    .map_err(|err| (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()))?;
+        "#;
+
+    let rows = sqlx::query(query_str)
+        .fetch_all(&pool)
+        .await
+        .map_err(|err| (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()))?;
 
     let posts: Vec<Post> = rows
         .into_iter()
@@ -49,5 +55,5 @@ pub async fn posts(State(pool): State<PgPool>) -> Result<impl IntoResponse, (Sta
         })
         .collect();
 
-    Ok(Json(posts))
+    Ok((StatusCode::OK, Json(posts)))
 }

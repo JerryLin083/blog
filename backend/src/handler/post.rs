@@ -2,15 +2,15 @@ use axum::{Json, extract::State, http::StatusCode, response::IntoResponse};
 use serde::Serialize;
 use sqlx::{PgPool, Row};
 
-use super::{Post, User};
+use super::{PostRequest, UserRequest};
 
 pub async fn create_user(
     State(pool): State<PgPool>,
-    user: Json<User>,
+    user: Json<UserRequest>,
 ) -> Result<impl IntoResponse, (StatusCode, String)> {
     let query_str = r#"
-        insert into users(first_name, last_name, email, phone, address)
-        values($1, $2, $3, $4, $5) returning user_id, first_name, last_name
+            insert into users(first_name, last_name, email, phone, address)
+            values($1, $2, $3, $4, $5) returning user_id, first_name, last_name
         "#;
 
     let row = sqlx::query(query_str)
@@ -41,7 +41,7 @@ struct CreatedUser {
 
 pub async fn create_post(
     State(pool): State<PgPool>,
-    post: Json<Post>,
+    post: Json<PostRequest>,
 ) -> Result<impl IntoResponse, (StatusCode, String)> {
     let query_str = r#"
         insert into posts(title, content, user_id)
@@ -57,16 +57,16 @@ pub async fn create_post(
         .await
         .map_err(|err| (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()))?;
 
-    let create_post = CreatePost {
+    let create_post = CreatedPost {
         id: row.get(0),
         title: row.get(1),
     };
 
-    Ok(Json(create_post))
+    Ok((StatusCode::CREATED, Json(create_post)))
 }
 
 #[derive(Serialize)]
-struct CreatePost {
+struct CreatedPost {
     id: i32,
     title: String,
 }

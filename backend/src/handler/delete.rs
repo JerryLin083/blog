@@ -13,13 +13,14 @@ pub async fn delete_user(
       delete from users where user_id = $1
     "#;
 
-    sqlx::query(query_str)
+    let result = sqlx::query(query_str)
         .bind(id)
-        .fetch_optional(&pool)
+        .execute(&pool)
         .await
-        .map_err(|err| (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()))?;
+        .map_err(|err| (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()))?
+        .rows_affected();
 
-    Ok(String::from("Ok"))
+    Ok((StatusCode::NO_CONTENT, result.to_string()))
 }
 pub async fn delete_post(
     State(pool): State<PgPool>,
@@ -29,11 +30,12 @@ pub async fn delete_post(
       delete from posts where id = $1
     "#;
 
-    sqlx::query(query_str)
+    let result = sqlx::query(query_str)
         .bind(id)
-        .fetch_optional(&pool)
+        .execute(&pool)
         .await
-        .map_err(|err| (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()))?;
+        .map_err(|err| (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()))?
+        .rows_affected();
 
-    Ok(String::from("Ok"))
+    Ok((StatusCode::NO_CONTENT, result.to_string()))
 }

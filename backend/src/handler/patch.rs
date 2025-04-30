@@ -6,12 +6,12 @@ use axum::{
 };
 use sqlx::PgPool;
 
-use super::User;
+use super::UserRequest;
 
 pub async fn patch_user(
     State(pool): State<PgPool>,
     Path(id): Path<i32>,
-    Json(user): Json<User>,
+    Json(user): Json<UserRequest>,
 ) -> Result<impl IntoResponse, (StatusCode, String)> {
     let query_str = r#"
         update users set
@@ -23,17 +23,40 @@ pub async fn patch_user(
         where user_id = $6
       "#;
 
-    sqlx::query(query_str)
+    let result = sqlx::query(query_str)
         .bind(&user.first_name)
         .bind(&user.last_name)
         .bind(&user.email)
         .bind(&user.phone)
         .bind(&user.address)
         .bind(id)
-        .fetch_optional(&pool)
+        .execute(&pool)
         .await
-        .map_err(|err| (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()))?;
+        .map_err(|err| (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()))?
+        .rows_affected();
 
-    Ok(String::from("Ok"))
+    Ok((StatusCode::OK, result.to_string()))
 }
-pub async fn patch_post() {}
+
+pub async fn patch_post(
+    State(pool): State<PgPool>,
+    Path(id): Path<i32>,
+) -> Result<impl IntoResponse, (StatusCode, String)> {
+    let query_str = r#"
+      update posts set
+      update_at = NOW(),
+      published_at = NOW()
+      where id = $1
+    "#;
+
+    let result = sqlx::query(query_str)
+        .bind(id)
+        .execute(&pool)
+        .await
+        .map_err(|err| (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()))?
+        .rows_affected();
+
+    Ok((StatusCode::OK, result.to_string()))
+}
+
+//TODO: update post by id

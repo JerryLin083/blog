@@ -25,8 +25,6 @@ pub async fn router(state: Pool<Postgres>) -> Router {
         .route("/api/users/{id}", delete(delete_user))
         .route("/api/posts/{id}", delete(delete_post));
 
-    //TODO: delete router
-
     let app = Router::new()
         .merge(get_router)
         .merge(post_router)
