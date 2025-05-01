@@ -3,6 +3,8 @@ use serde::{Deserialize, Serialize};
 
 mod get;
 pub use get::posts;
+pub use get::the_post;
+pub use get::the_user;
 pub use get::users;
 
 mod post;

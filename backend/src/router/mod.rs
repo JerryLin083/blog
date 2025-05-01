@@ -13,7 +13,7 @@ pub async fn router(state: Pool<Postgres>) -> Router {
 
     let app = Router::new()
         .nest("/api", api_router)
-        .nest("/", static_router)
+        .merge(static_router)
         .with_state(state);
 
     tracing::info!("Router init ...");
