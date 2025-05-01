@@ -1,35 +1,19 @@
-use axum::{
-    Router,
-    routing::{delete, get, patch, post},
-};
+use axum::Router;
 use sqlx::{Pool, Postgres};
 
-use crate::handler::{
-    create_post, create_user, delete_post, delete_user, patch_post, patch_user, posts, users,
-};
+mod api;
+use api::api_router;
+
+mod static_file;
+use static_file::static_router;
 
 pub async fn router(state: Pool<Postgres>) -> Router {
-    let get_router = Router::new()
-        .route("/api/users", get(users))
-        .route("/api/posts", get(posts));
-
-    let post_router = Router::new()
-        .route("/api/users", post(create_user))
-        .route("/api/posts", post(create_post));
-
-    let patch_router = Router::new()
-        .route("/api/users/{id}", patch(patch_user))
-        .route("/api/posts/{id}", patch(patch_post));
-
-    let delete_router = Router::new()
-        .route("/api/users/{id}", delete(delete_user))
-        .route("/api/posts/{id}", delete(delete_post));
+    let api_router = api_router();
+    let static_router = static_router();
 
     let app = Router::new()
-        .merge(get_router)
-        .merge(post_router)
-        .merge(patch_router)
-        .merge(delete_router)
+        .nest("/api", api_router)
+        .nest("/", static_router)
         .with_state(state);
 
     tracing::info!("Router init ...");
