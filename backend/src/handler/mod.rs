@@ -1,58 +1,25 @@
-use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
+mod api;
 
-mod get;
-pub use get::home;
-pub use get::posts;
-pub use get::the_post;
-pub use get::the_user;
-pub use get::users;
+//get
+pub(crate) use api::posts;
+pub(crate) use api::the_post;
+pub(crate) use api::the_user;
+pub(crate) use api::users;
 
-mod post;
-pub use post::create_post;
-pub use post::create_user;
+//post
+pub(crate) use api::create_post;
+pub(crate) use api::create_user;
 
-mod patch;
-pub use patch::patch_post;
-pub use patch::patch_user;
+//patch
+pub(crate) use api::edit_post;
+pub(crate) use api::patch_user;
+pub(crate) use api::publish_post;
 
-mod delete;
-pub use delete::delete_post;
-pub use delete::delete_user;
+//delete
+pub(crate) use api::delete_post;
+pub(crate) use api::delete_user;
 
-#[derive(Deserialize)]
-pub(crate) struct UserRequest {
-    first_name: String,
-    last_name: String,
-    email: String,
-    phone: String,
-    address: String,
-}
-
-#[derive(Serialize)]
-pub(crate) struct User {
-    id: i32,
-    first_name: String,
-    last_name: String,
-    email: String,
-    phone: String,
-    address: String,
-}
-
-#[derive(Deserialize)]
-pub(crate) struct PostRequest {
-    title: String,
-    content: String,
-    user_id: i32,
-}
-
-#[derive(Serialize)]
-pub(crate) struct Post {
-    id: i32,
-    title: String,
-    content: String,
-    user_id: i32,
-    create_at: DateTime<Utc>,
-    update_at: DateTime<Utc>,
-    published_at: DateTime<Utc>,
-}
+mod static_file;
+//get
+pub(crate) use static_file::home;
+pub(crate) use static_file::not_found;

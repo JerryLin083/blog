@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="us-EN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>404 - NOT FOUND</title>
+    <link rel="stylesheet" crossorigin="" href="/assets/404.css" />
+  </head>
+  <body>
+    <div class="particles">
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+    </div>
+
+    <div class="container">
+      <h1 class="error-code">404</h1>
+      <h2 class="error-text">PAGE NOT FOUND</h2>
+      <a href="/" class="back-button">BACK HOME</a>
+    </div>
+
+    <script>
+      // Add some randomness to the floating particles
+      document.addEventListener("DOMContentLoaded", function () {
+        const particles = document.querySelectorAll(".particle");
+
+        particles.forEach((particle) => {
+          const randomX = Math.random() * 200 - 100; // Random X offset between -100 and 100
+          const randomDuration = 15 + Math.random() * 10; // Random duration between 15 and 25 seconds
+
+          particle.style.animationDuration = `${randomDuration}s`;
+          particle.style.transform = `translateX(${randomX}px)`;
+        });
+      });
+    </script>
+  </body>
+</html>

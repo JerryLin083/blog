@@ -1,6 +1,8 @@
 backend/target
 backend/self_signed_cert
 
+frontend/node_modules
+
 .env
 
 

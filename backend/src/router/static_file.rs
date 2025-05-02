@@ -2,10 +2,11 @@ use axum::{Router, routing::get};
 use sqlx::{Pool, Postgres};
 use tower_http::services::ServeDir;
 
-use crate::handler::home;
+use crate::handler::{home, not_found};
 
 pub(crate) fn static_router() -> Router<Pool<Postgres>> {
-    let router = Router::new().route("/home", get(home));
-
-    router.nest_service("/assets", ServeDir::new("static/assets"))
+    Router::new()
+        .route("/", get(home))
+        .nest_service("/assets", ServeDir::new("static/assets"))
+        .fallback(get(not_found))
 }

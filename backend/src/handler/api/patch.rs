@@ -6,7 +6,7 @@ use axum::{
 };
 use sqlx::PgPool;
 
-use super::UserRequest;
+use super::{PostRequest, UserRequest};
 
 pub async fn patch_user(
     State(pool): State<PgPool>,
@@ -38,7 +38,7 @@ pub async fn patch_user(
     Ok((StatusCode::OK, result.to_string()))
 }
 
-pub async fn patch_post(
+pub async fn publish_post(
     State(pool): State<PgPool>,
     Path(id): Path<i32>,
 ) -> Result<impl IntoResponse, (StatusCode, String)> {
@@ -60,3 +60,27 @@ pub async fn patch_post(
 }
 
 //TODO: update post by id
+pub async fn edit_post(
+    State(pool): State<PgPool>,
+    Path(id): Path<i32>,
+    Json(post): Json<PostRequest>,
+) -> Result<impl IntoResponse, (StatusCode, String)> {
+    let query_str = r#"
+        update posts set 
+        title = $1,
+        content = $2,
+        update_at = NOW()
+        where id = $3
+    "#;
+
+    let result = sqlx::query(query_str)
+        .bind(&post.title)
+        .bind(&post.content)
+        .bind(id)
+        .execute(&pool)
+        .await
+        .map_err(|err| (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()))?
+        .rows_affected();
+
+    Ok((StatusCode::OK, result.to_string()))
+}
