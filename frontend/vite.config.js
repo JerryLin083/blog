@@ -5,9 +5,9 @@ export default defineConfig(() => {
   return {
     plugins: [solid()],
     build: {
-      //assetsInlineLimit: 0,
+      assetsInlineLimit: 0,
       outDir: "../backend/static",
-      emptyOutDir: true,
+      emptyOutDir: false,
     },
   };
 });
