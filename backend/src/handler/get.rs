@@ -1,10 +1,10 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, path::PathBuf};
 
 use axum::{
     Json,
     extract::{Path, Query, State},
     http::StatusCode,
-    response::IntoResponse,
+    response::{Html, IntoResponse},
 };
 use sqlx::{PgPool, Result, Row};
 
@@ -142,4 +142,18 @@ pub async fn posts(
             "Missing required query parameter: page".to_string(),
         ))
     }
+}
+
+//TODO: Get correct home page from frontend static files;
+pub async fn home() -> Result<impl IntoResponse, (StatusCode, String)> {
+    //get frontend html;
+    let html_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("static")
+        .join("index.html");
+
+    let home_html = tokio::fs::read_to_string(html_path)
+        .await
+        .map_err(|err| (StatusCode::NOT_FOUND, err.to_string()))?;
+
+    Ok(Html(home_html))
 }

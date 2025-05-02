@@ -2,6 +2,7 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 mod get;
+pub use get::home;
 pub use get::posts;
 pub use get::the_post;
 pub use get::the_user;

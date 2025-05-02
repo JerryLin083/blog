@@ -1,10 +1,11 @@
-use axum::Router;
+use axum::{Router, routing::get};
 use sqlx::{Pool, Postgres};
+use tower_http::services::ServeDir;
+
+use crate::handler::home;
 
 pub(crate) fn static_router() -> Router<Pool<Postgres>> {
-    //TODO:handle frontend file and MIME file.
+    let router = Router::new().route("/home", get(home));
 
-    let router = Router::new();
-
-    router
+    router.nest_service("/assets", ServeDir::new("static/assets"))
 }
