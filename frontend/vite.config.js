@@ -7,7 +7,7 @@ export default defineConfig(() => {
     build: {
       assetsInlineLimit: 0,
       outDir: "../backend/static",
-      emptyOutDir: false,
+      emptyOutDir: true,
     },
   };
 });

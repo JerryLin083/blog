@@ -22,4 +22,3 @@ pub(crate) use api::delete_user;
 mod static_file;
 //get
 pub(crate) use static_file::home;
-pub(crate) use static_file::not_found;
