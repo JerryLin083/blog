@@ -1,14 +1,17 @@
 .footer {
   color: #111;
   position: fixed;
-  bottom: 0.5rem;
+  bottom: 0.2rem;
   right: 4rem;
 }
 
 .footer_container {
+  padding: 0.2rem 0;
   display: flex;
   width: 280px;
   flex-direction: row;
   justify-content: space-evenly;
   align-items: center;
+  border-radius: 10px;
+  background-color: #fcbc0c;
 }

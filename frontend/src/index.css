@@ -19,11 +19,11 @@ a {
   font-weight: 500;
   text-decoration: inherit;
 }
-a:hover {
+/* a:hover {
   border-bottom: solid 1px;
   cursor: pointer;
   color: #535bf2;
-}
+} */
 
 body {
   margin: 0;
@@ -69,7 +69,7 @@ button:focus-visible {
 .pixel-title {
   color: #999;
   text-shadow: 2px 2px #777;
-  font-size: 2em;
+  font-size: 3.5em;
   margin-bottom: 20px;
 }
 

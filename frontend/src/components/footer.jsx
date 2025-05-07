@@ -8,12 +8,11 @@ function Footer() {
     <footer class="footer">
       <div class="footer_container">
         <span>Made with</span>
-        <a href="https://www.solidjs.com/" target="_blank">
-          <img src={solidjs} width="32" height="32" alt="solid_logo" />
-        </a>
-
         <a href="https://github.com/tokio-rs/axum" target="_blank">
-          <img src={axum} width="32" height="32" alt="axum_log" />
+          <img src={axum} width="28" height="28" alt="axum_log" />
+        </a>
+        <a href="https://www.solidjs.com/" target="_blank">
+          <img src={solidjs} width="28" height="28" alt="solid_logo" />
         </a>
       </div>
     </footer>
