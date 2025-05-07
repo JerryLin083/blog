@@ -4,6 +4,8 @@ import { A } from "@solidjs/router";
 import rat from "../assets/icons-rat.svg";
 import racoon from "../assets/icons-racoon.svg";
 import turtle from "../assets/icons-turtle.svg";
+import dolphin from "../assets/icons-dolphin.svg";
+import shark from "../assets/icons-shark.svg";
 
 function Home() {
   return (
@@ -40,12 +42,14 @@ function Home() {
 
       <div class="animals_area">
         <img src={rat} alt="rat" height="64" width="64" />
+        <img src={shark} alt="shark" height="64" width="64" />
         <img src={racoon} alt="racoon" height="64" width="64" />
         <img src={turtle} alt="turtle" height="64" width="64" />
+        <img src={dolphin} alt="dolphin" height="64" width="64" />
       </div>
 
       <div class="button_area">
-        <A href="/posts">browsing around.</A>
+        <A href="/posts">Wonder around</A>
       </div>
     </div>
   );

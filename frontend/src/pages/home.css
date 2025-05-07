@@ -15,7 +15,7 @@
 .animals_area {
   display: flex;
   flex-direction: row;
-  width: 20%;
+  width: 30%;
   margin: 3rem auto;
   justify-content: space-around;
   align-items: center;
@@ -38,4 +38,5 @@
 }
 .button_area > a:hover {
   border-color: #646cff;
+  color: greenyellow;
 }
