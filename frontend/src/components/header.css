@@ -19,3 +19,15 @@
   align-items: center;
   height: 2.5rem;
 }
+
+.link {
+  padding: 8px 12px;
+  border-radius: 5px;
+  margin-left: 2.5rem;
+}
+
+.link:hover {
+  border-bottom: solid 2px;
+  cursor: pointer;
+  color: #535bf2;
+}

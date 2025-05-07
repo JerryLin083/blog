@@ -16,14 +16,11 @@
 a {
   color: black;
   list-style-type: none;
-  padding: 8px 12px;
-  border-radius: 5px;
-  margin-left: 2.5rem;
   font-weight: 500;
   text-decoration: inherit;
 }
 a:hover {
-  border-bottom: solid 2px;
+  border-bottom: solid 1px;
   cursor: pointer;
   color: #535bf2;
 }
