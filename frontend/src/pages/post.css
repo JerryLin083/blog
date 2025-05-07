@@ -1,0 +1,17 @@
+.pixel-post-title {
+  color: #222;
+  font-size: 1.8em;
+  margin-bottom: 15px;
+  text-shadow: 2px 2px #444;
+}
+
+.post_detail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.post-content {
+  line-height: 1.6;
+  white-space: pre-wrap; /* 保留換行和空格 */
+}

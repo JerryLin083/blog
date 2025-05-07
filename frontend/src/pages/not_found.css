@@ -1,0 +1,15 @@
+.not-found {
+  text-align: center;
+}
+
+.pixel-error {
+  font-size: 4em;
+  color: #ff6666;
+  text-shadow: 3px 3px #cc4444;
+  margin-bottom: 10px;
+}
+
+.pixel-message {
+  color: #777;
+  font-size: 1.2em;
+}

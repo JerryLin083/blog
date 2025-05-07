@@ -1,0 +1,11 @@
+.pixel-page-title {
+  color: #444;
+  font-size: 1.5em;
+  margin-bottom: 20px;
+  text-shadow: 1px 1px #777;
+}
+
+.post-list {
+  list-style: none;
+  padding: 0;
+}

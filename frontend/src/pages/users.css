@@ -1,0 +1,7 @@
+.user-list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* 響應式佈局 */
+  gap: 15px;
+}

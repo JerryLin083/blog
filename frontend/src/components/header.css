@@ -1,0 +1,21 @@
+.haeder {
+  height: 100px;
+}
+
+.nav_bar {
+  padding: 1rem 2rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  background-color: rgb(252, 188, 12);
+}
+
+.nav_link {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 2.5rem;
+}

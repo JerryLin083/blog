@@ -1,5 +1,5 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Press Start 2P", cursive;
   line-height: 1.5;
   font-weight: 400;
 
@@ -14,11 +14,17 @@
 }
 
 a {
+  color: black;
+  list-style-type: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  margin-left: 2.5rem;
   font-weight: 500;
-  color: #646cff;
   text-decoration: inherit;
 }
 a:hover {
+  border-bottom: solid 2px;
+  cursor: pointer;
   color: #535bf2;
 }
 
@@ -26,8 +32,11 @@ body {
   margin: 0;
   display: flex;
   place-items: center;
-  min-width: 320px;
+  min-width: 280px;
   min-height: 100vh;
+  background-image: url(assets/background.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 h1 {
@@ -54,6 +63,19 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+.pixel-container {
+  font-family: "Press Start 2P", cursive; /* 像素字體，你需要引入 */
+  background-color: black;
+  padding: 20px;
+}
+
+.pixel-title {
+  color: #999;
+  text-shadow: 2px 2px #777;
+  font-size: 2em;
+  margin-bottom: 20px;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
@@ -64,5 +86,14 @@ button:focus-visible {
   }
   button {
     background-color: #f9f9f9;
+  }
+
+  .pixel-container {
+    background-color: #f0f0f0;
+  }
+
+  .pixel-title {
+    color: #333;
+    text-shadow: 2px 2px #555;
   }
 }
