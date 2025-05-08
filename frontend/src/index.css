@@ -73,6 +73,14 @@ button:focus-visible {
   margin-bottom: 20px;
 }
 
+.loading {
+  margin: auto;
+}
+
+.loading > img {
+  animation: rotate 2s linear infinite;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

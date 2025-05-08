@@ -49,7 +49,7 @@ function Home() {
       </div>
 
       <div class="button_area">
-        <A href="/posts">Wonder around</A>
+        <A href="/posts?page=1">Wonder around</A>
       </div>
     </div>
   );

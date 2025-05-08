@@ -9,3 +9,16 @@
   list-style: none;
   padding: 0;
 }
+
+.posts-container {
+  overflow-y: scroll;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

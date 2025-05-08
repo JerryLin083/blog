@@ -1,28 +1,66 @@
-import { useParams } from "@solidjs/router";
-import { createSignal } from "solid-js";
+import { A, useNavigate, useParams } from "@solidjs/router";
+import { createEffect, createSignal } from "solid-js";
 
 import "./post.css";
+import Loading from "../components/loading";
+import sloth_avatar from "../assets/icons-avatar-sloth.svg";
+import avacado_avatar from "../assets/icons-avatar-avacado.svg";
 
 function Post() {
-  //TODO: get post id and fetch data from server;
   const params = useParams();
+  const [post, setPost] = createSignal({});
+  const [isLoading, setIsLoading] = createSignal(false);
+  const navigate = useNavigate();
 
-  const [post, setPost] = createSignal(null);
+  let post_published_date = () => new Date(post()?.published_at);
+
+  createEffect(async () => {
+    setIsLoading(true);
+    try {
+      let res = await fetch(`/api/posts/${params.id}`);
+      let post = await res.json();
+
+      if (post.isEmpty) {
+        navigate("/not_found", { replace: true });
+        return;
+      }
+
+      setPost(post[0]);
+      setIsLoading(false);
+    } catch (e) {
+      navigate("/not-found", { replace: true });
+
+      return;
+    }
+  });
 
   return (
-    <div class="pixel-container post-detail">
-      {post() ? (
-        <>
-          <h1 class="pixel-post-title">{post().title}</h1>
-          <div class="post-content">{post().content}</div>{" "}
-          {/* 使用 dangerouslySetInnerHTML 注意安全性 */}
-          {/* 其他文章詳細資訊，例如作者、日期等 */}
-        </>
+    <>
+      {isLoading() ? (
+        <Loading />
       ) : (
-        // TODO: use animation loading
-        <p>Loading...</p>
+        <div class="pixel-container post-detail">
+          <div class="post-info">
+            <p>{post_published_date().toLocaleDateString()}</p>
+            <p>
+              {post().author ? (
+                <A href={`/users/${post().user_id}`}>{post().author}</A>
+              ) : (
+                "unknown"
+              )}
+            </p>
+            <img
+              src={post().user_id % 2 == 0 ? sloth_avatar : avacado_avatar}
+              alt="avatar"
+              height="48"
+              width="48"
+            />
+          </div>
+          <h3 class="pixel-post-title">{post().title}</h3>
+          <section class="post-content">{post().content}</section>
+        </div>
       )}
-    </div>
+    </>
   );
 }
 
