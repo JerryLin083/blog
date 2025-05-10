@@ -1,0 +1,41 @@
+.user-card {
+  width: 580px;
+  margin: auto;
+  padding: 0.5rem 1rem;
+  border: solid 1px transparent;
+  border-radius: 10px;
+  background-color: #333333;
+}
+
+.user-card:hover {
+  border: dotted 2px #646cff;
+}
+
+.user-card a {
+  font-family: "Tagesschrift", system-ui;
+  font-size: 1.5rem;
+  color: rgb(252, 188, 12);
+}
+
+.user-card a:hover {
+  border-bottom: dotted 2px #646cff;
+  color: rgb(255, 211, 90);
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: left;
+  align-items: center;
+}
+
+.user-info > div {
+  width: 100%;
+  margin-top: 0.5rem;
+  margin-left: 3rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+  align-items: center;
+  font-size: 12px;
+}

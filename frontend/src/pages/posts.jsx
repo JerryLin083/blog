@@ -7,11 +7,10 @@ import Loading from "../components/loading";
 
 function Posts() {
   const [isLoading, setIsLoading] = createSignal(false);
-  const [posts, setPosts] = createSignal([]); // 假設 dummyData 已經定義
+  const [posts, setPosts] = createSignal([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  // 從 searchParams 中獲取 page 值，並在改變時觸發 effect
   const page = () => searchParams.page;
 
   createEffect(async () => {
@@ -22,7 +21,6 @@ function Posts() {
     }
 
     setIsLoading(true);
-    // TODO: 使用 currentPage 獲取對應頁碼的資料
     let res = await fetch(`/api/posts?page=${currentPage}`);
     try {
       let posts = await res.json();
@@ -54,7 +52,7 @@ function Posts() {
                 Prev
               </button>
             ) : null}{" "}
-            {posts().length > 0 ? (
+            {posts().length == 10 ? (
               <button onClick={() => handlePage(Number(page()) + 1)}>
                 Next
               </button>

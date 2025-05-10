@@ -39,4 +39,5 @@
   line-height: 1.6;
   white-space: pre-wrap; /* 保留換行和空格 */
   flex-grow: 1;
+  margin: 2rem;
 }

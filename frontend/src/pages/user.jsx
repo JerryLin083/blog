@@ -1,22 +1,37 @@
-import { useParams } from "@solidjs/router";
+import { useNavigate, useParams } from "@solidjs/router";
 import { createEffect, createSignal } from "solid-js";
 
 import "./user.css";
 import Loading from "../components/loading";
+import sloth_avatar from "../assets/icons-avatar-sloth.svg";
+import avacado_avatar from "../assets/icons-avatar-avacado.svg";
+import email from "../assets/icons-email.svg";
+import phone from "../assets/icons-phone.svg";
+import address from "../assets/icons-home.svg";
 
 function User() {
-  //TODO: get user id and fetch data from server;
   const params = useParams();
-  const [user, setUser] = createSignal(null);
+  const [user, setUser] = createSignal({});
   const [isLoading, setIsLoading] = createSignal(false);
+  const navigate = useNavigate();
 
   createEffect(async () => {
     setIsLoading(true);
-    // let res = await fetch(`/users/${params.id}`);
-    // let user = await res.json();
+    try {
+      let res = await fetch(`/api/users/${params.id}`);
+      let user = await res.json();
 
-    // setUser(user);
-    // setIsLoading(false);
+      if (user.isEmpty) {
+        navigate("/not_found", { replace: true });
+        return;
+      }
+
+      setUser(user[0]);
+      setIsLoading(false);
+    } catch (e) {
+      navigate("/not_found", { replace: true });
+      return;
+    }
   });
 
   return (
@@ -26,10 +41,30 @@ function User() {
       ) : (
         <div class="pixel-container user-detail">
           <div class="user-avatar">
-            <h2>User name</h2>
+            <img
+              src={user().id % 2 == 0 ? sloth_avatar : avacado_avatar}
+              height="128"
+              width="128"
+              alt="avatar"
+            />
           </div>
-          <h2 class="pixel-user-title">username</h2>
-          {/* 其他使用者詳細資訊 */}
+          <h2 class="pixel-user-title">
+            {user().first_name} {user().last_name}
+          </h2>
+          <div class="user-info">
+            <div>
+              <img src={email} height="20" width="20" alt="email" />
+              <span>: {user().email ? user().email : "Unknown"}</span>
+            </div>
+            <div>
+              <img src={phone} height="20" width="20" alt="phone" />
+              <span>: {user().phone ? user().phone : "Unknown"}</span>
+            </div>
+            <div>
+              <img src={address} height="20" width="20" alt="address" />
+              <span>: {user().address ? user().address : "Unknown"}</span>
+            </div>
+          </div>
         </div>
       )}
     </>

@@ -1,6 +1,6 @@
 import "./post_card.css";
 import default_image from "../assets/icons-image.svg";
-import avacato_avatar from "../assets/icons-avatar-avacado.svg";
+import avacado_avatar from "../assets/icons-avatar-avacado.svg";
 import sloth_avatar from "../assets/icons-avatar-sloth.svg";
 import { A } from "@solidjs/router";
 
@@ -20,7 +20,7 @@ function PostCard(props) {
         </div>
         <div class="article">
           <img
-            src={post.id % 2 == 0 ? sloth_avatar : avacato_avatar} //TODO: delete after dev
+            src={post.user_id % 2 == 0 ? sloth_avatar : avacado_avatar} //TODO: delete after dev
             alt="avatar"
             height="32"
             width="32"
