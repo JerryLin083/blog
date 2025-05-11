@@ -8,13 +8,12 @@ use std::{
 use tokio::{sync::Mutex, time::sleep};
 use uuid::Uuid;
 
-//TODO: add session manager as state
-pub fn session_builder(duration: Duration) -> SessionManager {
-    SessionManager {
+pub fn session_builder(duration: Duration) -> Arc<SessionManager> {
+    Arc::new(SessionManager {
         sessions: Arc::new(Mutex::new(HashMap::new())),
         expires: Arc::new(Mutex::new(BinaryHeap::new())),
         duration,
-    }
+    })
 }
 
 pub struct SessionManager {
@@ -24,7 +23,7 @@ pub struct SessionManager {
 }
 
 impl SessionManager {
-    pub(crate) async fn create_session(&mut self, user_id: i32) {
+    pub(crate) async fn create_session(self: &mut Arc<Self>, user_id: i32) -> String {
         let mut sessions = self.sessions.lock().await;
         let mut expires = self.expires.lock().await;
 
@@ -33,19 +32,30 @@ impl SessionManager {
 
         sessions.insert(session_id.clone(), Session { user_id });
         expires.push(Expire(expired_time, session_id.clone()));
+
+        session_id
     }
 
-    pub(crate) async fn delete_session(&mut self, session_id: String) {
+    pub(crate) async fn delete_session(self: &Arc<Self>, session_id: String) {
         let mut sessions = self.sessions.lock().await;
 
         sessions.remove(&session_id);
     }
 
-    pub(crate) async fn run_check(self: &Arc<Self>) {
+    pub(crate) async fn check_session_id(
+        self: &mut Arc<Self>,
+        session_id: &str,
+    ) -> Option<Session> {
+        let sessions = self.sessions.lock().await;
+
+        sessions.get(session_id).cloned()
+    }
+
+    pub(crate) fn run_check(self: &Arc<Self>) {
         let session_manager = self.clone();
 
         tokio::spawn(async move {
-            //TODO: Init next check time
+            //Init next check time
             let mut check_timing = session_manager.duration;
 
             loop {
@@ -96,7 +106,8 @@ impl SessionManager {
     }
 }
 
-struct Session {
+#[derive(Clone)]
+pub struct Session {
     user_id: i32,
 }
 
