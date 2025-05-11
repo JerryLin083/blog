@@ -15,3 +15,4 @@ dotenv = "0.15.0"
 serde = "1.0.219"
 chrono = {version = "0.4.41", features = ["serde"]}
 tower-http = { version = "0.6.2", features = ["fs", "trace"] }
+uuid = {version = "1.16.0", features=["v4"]}

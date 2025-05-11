@@ -1,10 +1,23 @@
 use axum_server::tls_rustls::RustlsConfig;
-use std::{net::SocketAddr, path::PathBuf};
+use sqlx::{Pool, Postgres};
 
-use crate::{db::db_connection, router::router};
+use std::{net::SocketAddr, path::PathBuf, time::Duration};
+
+use crate::{
+    db::db_connection,
+    router::router,
+    session::{SessionManager, session_builder},
+};
 
 pub async fn run() {
     let pool = db_connection().await;
+    let session_manager = session_builder(Duration::from_secs(5 * 60));
+
+    // let app_state = AppState {
+    //     pool,
+    //     session_manager,
+    // };
+
     let router = router(pool).await;
 
     let config = RustlsConfig::from_pem_file(
@@ -18,8 +31,6 @@ pub async fn run() {
     .await
     .unwrap();
 
-    //TODO: redirect http to https
-
     let addr = SocketAddr::from(([127, 0, 0, 1], 8000 as u16));
     tracing::info!("Listening on {}...", addr);
 
@@ -29,4 +40,9 @@ pub async fn run() {
     {
         panic!("Server error: {}", err);
     }
+}
+
+pub struct AppState {
+    pool: Pool<Postgres>,
+    session_manager: SessionManager,
 }
