@@ -8,7 +8,9 @@ pub(crate) use api::users;
 
 //post
 pub(crate) use api::create_post;
-pub(crate) use api::create_user;
+pub(crate) use api::login;
+pub(crate) use api::logout;
+pub(crate) use api::signup;
 
 //patch
 pub(crate) use api::edit_post;
@@ -20,5 +22,6 @@ pub(crate) use api::delete_post;
 pub(crate) use api::delete_user;
 
 mod static_file;
-//get
+
+//static get
 pub(crate) use static_file::home;

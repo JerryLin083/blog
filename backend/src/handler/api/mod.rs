@@ -11,7 +11,9 @@ pub use get::users;
 
 mod post;
 pub use post::create_post;
-pub use post::create_user;
+pub use post::login;
+pub use post::logout;
+pub use post::signup;
 
 mod patch;
 pub use patch::edit_post;
@@ -58,4 +60,10 @@ pub(crate) struct Post {
     create_at: DateTime<Utc>,
     update_at: DateTime<Utc>,
     published_at: DateTime<Utc>,
+}
+
+#[derive(Deserialize)]
+pub(crate) struct Account {
+    account: String,
+    password: String,
 }
