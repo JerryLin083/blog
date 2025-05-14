@@ -1,6 +1,7 @@
 mod api;
 
 //get
+pub(crate) use api::account;
 pub(crate) use api::posts;
 pub(crate) use api::the_post;
 pub(crate) use api::the_user;

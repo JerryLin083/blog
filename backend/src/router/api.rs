@@ -5,7 +5,7 @@ use axum::{
 use sqlx::{Pool, Postgres};
 
 use crate::handler::{
-    create_post, delete_post, delete_user, edit_post, login, logout, patch_user, posts,
+    account, create_post, delete_post, delete_user, edit_post, login, logout, patch_user, posts,
     publish_post, signup, the_post, the_user, users,
 };
 
@@ -14,7 +14,8 @@ pub fn api_router() -> Router<Pool<Postgres>> {
         .route("/users", get(users))
         .route("/users/{id}", get(the_user))
         .route("/posts", get(posts))
-        .route("/posts/{id}", get(the_post));
+        .route("/posts/{id}", get(the_post))
+        .route("/account/{account}", get(account));
 
     let post_router = Router::new()
         .route("/singup", post(signup))

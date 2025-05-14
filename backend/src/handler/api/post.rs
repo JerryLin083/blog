@@ -18,12 +18,16 @@ pub async fn create_post(
     headers: HeaderMap,
     post: Json<PostRequest>,
 ) -> Result<impl IntoResponse, impl IntoResponse> {
+    let mut user_id_from_session = String::new();
+
     // Get session id from header and check if in session_manager;
     if let Some(session_id_value) = headers.get("session_id") {
         if let Ok(session_id) = session_id_value.to_str() {
-            if session_manager.check_session_id(session_id).await.is_none() {
-                // Redirect to login page
-                return Ok(Redirect::to("/login"));
+            match session_manager.check_session_id(session_id).await {
+                Some(session) => {
+                    user_id_from_session = session.user_id.to_string();
+                }
+                None => return Ok(Redirect::to("/login")),
             }
         } else {
             return Err((
@@ -47,7 +51,7 @@ pub async fn create_post(
     let row = sqlx::query(query_str)
         .bind(&post.title)
         .bind(&post.content)
-        .bind(&post.user_id)
+        .bind(&user_id_from_session)
         .fetch_one(&pool)
         .await
         .map_err(|err| (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()))?;

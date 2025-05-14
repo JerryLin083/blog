@@ -108,7 +108,7 @@ impl SessionManager {
 
 #[derive(Clone)]
 pub struct Session {
-    user_id: i32,
+    pub user_id: i32,
 }
 
 #[derive(Debug, Eq, PartialEq, Clone)]

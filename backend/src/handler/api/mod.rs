@@ -4,6 +4,7 @@ use serde::Deserialize;
 use serde::Serialize;
 
 mod get;
+pub use get::account;
 pub use get::posts;
 pub use get::the_post;
 pub use get::the_user;
@@ -47,7 +48,6 @@ pub(crate) struct User {
 pub(crate) struct PostRequest {
     title: String,
     content: String,
-    user_id: i32,
 }
 
 #[derive(Serialize)]

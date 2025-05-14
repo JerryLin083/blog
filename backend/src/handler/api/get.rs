@@ -150,3 +150,24 @@ pub async fn posts(
         ))
     }
 }
+
+pub async fn account(
+    State(pool): State<PgPool>,
+    Path(account): Path<String>,
+) -> Result<impl IntoResponse, (StatusCode, String)> {
+    let query_str = r#"
+        select account_id from accounts where account = $1
+    "#;
+
+    let row = sqlx::query(query_str)
+        .bind(&account)
+        .fetch_all(&pool)
+        .await
+        .map_err(|err| (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()))?;
+
+    if row.is_empty() {
+        Ok((StatusCode::OK, "{\"result\": \"ok\"}"))
+    } else {
+        Ok((StatusCode::OK, "{\"result\": \"deny\"}"))
+    }
+}
