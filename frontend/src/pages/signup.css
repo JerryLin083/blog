@@ -1,0 +1,30 @@
+.signup-container {
+  margin: 4rem auto;
+  padding: 1.5rem 1.2rem;
+  border: dotted 2px #646cff;
+  border-radius: 10px;
+}
+
+.signup-container h3 {
+  font-family: "Tagesschrift", system-ui;
+  font-size: 4rem;
+  color: rgb(252, 188, 12);
+}
+
+.signup-form div {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.signup-form > p {
+  margin-top: 2rem;
+  color: red;
+  font-size: small;
+}
+
+.signup-form button {
+  margin-top: 2rem;
+}
