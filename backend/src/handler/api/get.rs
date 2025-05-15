@@ -3,9 +3,10 @@ use std::{collections::HashMap, sync::Arc};
 use axum::{
     Extension, Json,
     extract::{Path, Query, State},
-    http::{HeaderMap, StatusCode},
+    http::StatusCode,
     response::IntoResponse,
 };
+use axum_extra::extract::CookieJar;
 use sqlx::{PgPool, Result, Row};
 
 use crate::session::SessionManager;
@@ -175,30 +176,49 @@ pub async fn account(
 }
 
 pub async fn auth(
-    headers: HeaderMap,
+    jar: CookieJar,
     Extension(session_manager): Extension<Arc<SessionManager>>,
 ) -> Result<impl IntoResponse, (StatusCode, String)> {
-    if let Some(session_id_value) = headers.get("session_id") {
-        if let Ok(session_id) = session_id_value.to_str() {
-            match session_manager.check_auth(session_id).await {
-                Some(_) => return Ok((StatusCode::OK, "Session ID authenticated".to_string())),
-                None => {
-                    return Err((
-                        StatusCode::UNAUTHORIZED,
-                        "Session ID unauthenticated".to_string(),
-                    ));
-                }
+    if let Some(session_cookie) = jar.get("session_id") {
+        let session_id = session_cookie.value();
+
+        match session_manager.check_auth(session_id).await {
+            Some(_) => return Ok((StatusCode::OK, "session authenticated".to_string())),
+            None => {
+                return Err((
+                    StatusCode::UNAUTHORIZED,
+                    "session unauthenticated".to_string(),
+                ));
             }
-        } else {
-            return Err((
-                StatusCode::UNAUTHORIZED,
-                "Invalid Session ID Header".to_string(),
-            ));
         }
     } else {
         return Err((
             StatusCode::UNAUTHORIZED,
-            "Authentication required.".to_string(),
+            "Invalid Session ID Header".to_string(),
+        ));
+    }
+}
+
+pub async fn logout(
+    Extension(session_manager): Extension<Arc<SessionManager>>,
+    jar: CookieJar,
+) -> Result<impl IntoResponse, (StatusCode, String)> {
+    if let Some(session_cookie) = jar.get("session_id") {
+        let session_id = session_cookie.value();
+
+        match session_manager.delete_session(session_id).await {
+            Some(_) => return Ok((StatusCode::OK, "User has been logout".to_string())),
+            None => {
+                return Err((
+                    StatusCode::UNAUTHORIZED,
+                    "session unauthenticated".to_string(),
+                ));
+            }
+        }
+    } else {
+        return Err((
+            StatusCode::UNAUTHORIZED,
+            "Invalid Session ID Header".to_string(),
         ));
     }
 }

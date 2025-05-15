@@ -36,10 +36,13 @@ impl SessionManager {
         session_id
     }
 
-    pub(crate) async fn delete_session(self: Arc<Self>, session_id: &str) {
+    pub(crate) async fn delete_session(self: Arc<Self>, session_id: &str) -> Option<()> {
         let mut sessions = self.sessions.lock().await;
 
-        sessions.remove(session_id);
+        match sessions.remove(session_id) {
+            Some(_) => Some(()),
+            None => None,
+        }
     }
 
     pub(crate) async fn check_session_id(self: Arc<Self>, session_id: &str) -> Option<Session> {

@@ -4,62 +4,74 @@ use axum::{
     Extension, Json,
     extract::State,
     http::{HeaderMap, HeaderValue, StatusCode},
-    response::{IntoResponse, Redirect, Response},
+    response::{IntoResponse, Response},
 };
+use axum_extra::extract::CookieJar;
 use sqlx::{PgPool, Row};
 
 use crate::session::SessionManager;
 
-use super::{Account, PostRequest};
+use super::{Account, ApiErrorResponse, ApiResponse, PostRequest};
 
 pub async fn create_post(
     State(pool): State<PgPool>,
     Extension(session_manager): Extension<Arc<SessionManager>>,
-    headers: HeaderMap,
+    jar: CookieJar,
     post: Json<PostRequest>,
-) -> Result<impl IntoResponse, impl IntoResponse> {
-    let mut user_id_from_session = String::new();
-
+) -> impl IntoResponse {
     // Get session id from header and check if in session_manager;
-    if let Some(session_id_value) = headers.get("session_id") {
-        if let Ok(session_id) = session_id_value.to_str() {
-            match session_manager.check_session_id(session_id).await {
-                Some(session) => {
-                    user_id_from_session = session.user_id.to_string();
-                }
-                None => return Ok(Redirect::to("/login")),
+    if let Some(session_cookie) = jar.get("session_id") {
+        let session_id = session_cookie.value();
+        match session_manager.check_session_id(session_id).await {
+            Some(session) => {
+                let user_id_from_session = session.user_id.to_string();
+                let query_str = r#"
+                    insert into posts(title, content, user_id)
+                    values($1, $2, $3)
+                    returning id, title
+                "#;
+
+                let row = sqlx::query(query_str)
+                    .bind(&post.title)
+                    .bind(&post.content)
+                    .bind(&user_id_from_session)
+                    .fetch_one(&pool)
+                    .await
+                    .map_err(|err| {
+                        (
+                            StatusCode::INTERNAL_SERVER_ERROR,
+                            Json(ApiErrorResponse {
+                                error: "Internal server error".into(),
+                                message: err.to_string(),
+                            }),
+                        )
+                    })?;
+
+                let post_id: i32 = row.get(0);
+
+                //send new post id back to client
+                Ok(Json(ApiResponse {
+                    status: "success".into(),
+                    result: post_id.to_string(),
+                }))
             }
-        } else {
-            return Err((
-                StatusCode::UNAUTHORIZED,
-                "Invalid Session ID Header".to_string(),
-            ));
+            None => {
+                let error = ApiErrorResponse {
+                    error: "unauthorized".into(),
+                    message: "session was expired".into(),
+                };
+
+                return Err((StatusCode::UNAUTHORIZED, Json(error)));
+            }
         }
     } else {
-        return Err((
-            StatusCode::UNAUTHORIZED,
-            "Authentication required.".to_string(),
-        ));
+        let error = ApiErrorResponse {
+            error: "unauthorized".into(),
+            message: "Authentication required".into(),
+        };
+
+        return Err((StatusCode::UNAUTHORIZED, Json(error)));
     }
-
-    let query_str = r#"
-        insert into posts(title, content, user_id)
-        values($1, $2, $3)
-        returning id, title
-    "#;
-
-    let row = sqlx::query(query_str)
-        .bind(&post.title)
-        .bind(&post.content)
-        .bind(&user_id_from_session)
-        .fetch_one(&pool)
-        .await
-        .map_err(|err| (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()))?;
-
-    let post_id: i32 = row.get(0);
-
-    //redirect to post page
-    Ok(Redirect::to(&format!("/posts/{}", post_id)))
 }
 
 pub async fn signup(
@@ -144,27 +156,4 @@ pub async fn login(
         .body(axum::body::Body::empty())
         .unwrap();
     Ok(response)
-}
-
-pub async fn logout(
-    Extension(session_manager): Extension<Arc<SessionManager>>,
-    headers: HeaderMap,
-) -> Result<impl IntoResponse, (StatusCode, String)> {
-    if let Some(session_id_value) = headers.get("session_id") {
-        if let Ok(session_id) = session_id_value.to_str() {
-            session_manager.delete_session(session_id).await;
-        } else {
-            return Err((
-                StatusCode::UNAUTHORIZED,
-                "Invalid Session ID Header".to_string(),
-            ));
-        }
-    } else {
-        return Err((
-            StatusCode::UNAUTHORIZED,
-            "Authentication required.".to_string(),
-        ));
-    }
-
-    Ok(Redirect::to("/"))
 }

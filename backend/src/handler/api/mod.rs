@@ -6,6 +6,7 @@ use serde::Serialize;
 mod get;
 pub use get::account;
 pub use get::auth;
+pub use get::logout;
 pub use get::posts;
 pub use get::the_post;
 pub use get::the_user;
@@ -14,7 +15,6 @@ pub use get::users;
 mod post;
 pub use post::create_post;
 pub use post::login;
-pub use post::logout;
 pub use post::signup;
 
 mod patch;
@@ -67,4 +67,16 @@ pub(crate) struct Post {
 pub(crate) struct Account {
     account: String,
     password: String,
+}
+
+#[derive(Serialize)]
+pub(crate) struct ApiErrorResponse {
+    error: String,
+    message: String,
+}
+
+#[derive(Serialize)]
+pub(crate) struct ApiResponse {
+    status: String,
+    result: String,
 }

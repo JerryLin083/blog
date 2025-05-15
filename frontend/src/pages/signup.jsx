@@ -1,6 +1,7 @@
-import { createEffect, createSignal } from "solid-js";
-import "./signup.css";
+import { createSignal } from "solid-js";
 import { useNavigate } from "@solidjs/router";
+
+import "./signup.css";
 
 function SignUp() {
   const navigate = useNavigate();
@@ -22,8 +23,6 @@ function SignUp() {
       return;
     }
 
-    //TODO: Confirm whether the account has been registered
-
     try {
       setIsSubmit(true);
       let signUpJsonBody = {
@@ -31,6 +30,7 @@ function SignUp() {
         password: password(),
       };
 
+      //TODO: Confirm whether the account has been registered
       let accountRes = await fetch(`/api/account/${account()}`);
       let accountResult = await accountRes.json();
 
