@@ -36,19 +36,25 @@ impl SessionManager {
         session_id
     }
 
-    pub(crate) async fn delete_session(self: &Arc<Self>, session_id: &str) {
+    pub(crate) async fn delete_session(self: Arc<Self>, session_id: &str) {
         let mut sessions = self.sessions.lock().await;
 
         sessions.remove(session_id);
     }
 
-    pub(crate) async fn check_session_id(
-        self: &mut Arc<Self>,
-        session_id: &str,
-    ) -> Option<Session> {
+    pub(crate) async fn check_session_id(self: Arc<Self>, session_id: &str) -> Option<Session> {
         let sessions = self.sessions.lock().await;
 
         sessions.get(session_id).cloned()
+    }
+
+    pub(crate) async fn check_auth(self: Arc<Self>, session_id: &str) -> Option<()> {
+        let sessions = self.sessions.lock().await;
+
+        match sessions.get(session_id) {
+            Some(_) => Some(()),
+            None => None,
+        }
     }
 
     pub(crate) fn run_check(self: &Arc<Self>) {

@@ -14,7 +14,7 @@ use super::{Account, PostRequest};
 
 pub async fn create_post(
     State(pool): State<PgPool>,
-    Extension(mut session_manager): Extension<Arc<SessionManager>>,
+    Extension(session_manager): Extension<Arc<SessionManager>>,
     headers: HeaderMap,
     post: Json<PostRequest>,
 ) -> Result<impl IntoResponse, impl IntoResponse> {
@@ -62,7 +62,6 @@ pub async fn create_post(
     Ok(Redirect::to(&format!("/posts/{}", post_id)))
 }
 
-//TODO: handle signup
 pub async fn signup(
     State(pool): State<PgPool>,
     Extension(mut session_manager): Extension<Arc<SessionManager>>,
@@ -109,7 +108,6 @@ pub async fn signup(
     Ok(response)
 }
 
-//TODO: handle login
 pub async fn login(
     State(pool): State<PgPool>,
     Extension(mut session_manager): Extension<Arc<SessionManager>>,
@@ -148,7 +146,6 @@ pub async fn login(
     Ok(response)
 }
 
-//TODO: handle logout
 pub async fn logout(
     Extension(session_manager): Extension<Arc<SessionManager>>,
     headers: HeaderMap,
