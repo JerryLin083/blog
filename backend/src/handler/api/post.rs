@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use axum::{
     Extension, Json,
     extract::State,
@@ -8,10 +6,10 @@ use axum::{
 };
 use axum_extra::extract::CookieJar;
 use sqlx::{PgPool, Row};
-
-use crate::session::SessionManager;
+use std::sync::Arc;
 
 use super::{Account, ApiErrorResponse, ApiResponse, PostRequest};
+use crate::session::SessionManager;
 
 pub async fn create_post(
     State(pool): State<PgPool>,
@@ -19,7 +17,7 @@ pub async fn create_post(
     jar: CookieJar,
     post: Json<PostRequest>,
 ) -> impl IntoResponse {
-    // Get session id from header and check if in session_manager;
+    // Get session id from cookie and check if in session_manager;
     if let Some(session_cookie) = jar.get("session_id") {
         let session_id = session_cookie.value();
         match session_manager.check_session_id(session_id).await {
@@ -40,37 +38,29 @@ pub async fn create_post(
                     .map_err(|err| {
                         (
                             StatusCode::INTERNAL_SERVER_ERROR,
-                            Json(ApiErrorResponse {
-                                error: "Internal server error".into(),
-                                message: err.to_string(),
-                            }),
+                            Json(ApiErrorResponse::from_internal_error(err)),
                         )
                     })?;
 
                 let post_id: i32 = row.get(0);
 
                 //send new post id back to client
-                Ok(Json(ApiResponse {
-                    status: "success".into(),
-                    result: post_id.to_string(),
-                }))
+                Ok(Json(ApiResponse::from_ok(post_id.to_string())))
             }
             None => {
-                let error = ApiErrorResponse {
-                    error: "unauthorized".into(),
-                    message: "session was expired".into(),
-                };
-
-                return Err((StatusCode::UNAUTHORIZED, Json(error)));
+                return Err((
+                    StatusCode::UNAUTHORIZED,
+                    Json(ApiErrorResponse::from_unauthorized("session was expired")),
+                ));
             }
         }
     } else {
-        let error = ApiErrorResponse {
-            error: "unauthorized".into(),
-            message: "Authentication required".into(),
-        };
-
-        return Err((StatusCode::UNAUTHORIZED, Json(error)));
+        return Err((
+            StatusCode::UNAUTHORIZED,
+            Json(ApiErrorResponse::from_unauthorized(
+                "Authentication required",
+            )),
+        ));
     }
 }
 
@@ -78,7 +68,7 @@ pub async fn signup(
     State(pool): State<PgPool>,
     Extension(mut session_manager): Extension<Arc<SessionManager>>,
     account: Json<Account>,
-) -> Result<Response, (StatusCode, String)> {
+) -> Result<Response, (StatusCode, Json<ApiErrorResponse>)> {
     let query_str = r#"
         WITH new_account AS (
             insert into account(account, password)
@@ -96,7 +86,12 @@ pub async fn signup(
         .bind(&account.password)
         .fetch_one(&pool)
         .await
-        .map_err(|err| (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()))?;
+        .map_err(|err| {
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(ApiErrorResponse::from_internal_error(err)),
+            )
+        })?;
 
     let user_id: i32 = row.get(0);
 
@@ -124,7 +119,7 @@ pub async fn login(
     State(pool): State<PgPool>,
     Extension(mut session_manager): Extension<Arc<SessionManager>>,
     account: Json<Account>,
-) -> Result<Response, (StatusCode, String)> {
+) -> Result<Response, (StatusCode, Json<ApiErrorResponse>)> {
     let query_str = r#"
         select u.user_id from accounts a
         left join users u on u.account_id = a.account_id
@@ -136,7 +131,12 @@ pub async fn login(
         .bind(&account.password)
         .fetch_one(&pool)
         .await
-        .map_err(|err| (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()))?;
+        .map_err(|err| {
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(ApiErrorResponse::from_internal_error(err)),
+            )
+        })?;
 
     let user_id: i32 = row.get(0);
     //create session

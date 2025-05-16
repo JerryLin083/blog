@@ -11,12 +11,12 @@ use sqlx::{PgPool, Result, Row};
 
 use crate::session::SessionManager;
 
-use super::{Post, User};
+use super::{ApiErrorResponse, ApiResponse, Post, User};
 
 pub async fn the_user(
     State(pool): State<PgPool>,
     Path(id): Path<i32>,
-) -> Result<impl IntoResponse, (StatusCode, String)> {
+) -> Result<impl IntoResponse, (StatusCode, Json<ApiErrorResponse>)> {
     let query_str = r#"
         select * from users where user_id = $1
     "#;
@@ -25,7 +25,12 @@ pub async fn the_user(
         .bind(id)
         .fetch_all(&pool)
         .await
-        .map_err(|err| (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()))?;
+        .map_err(|err| {
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(ApiErrorResponse::from_internal_error(err)),
+            )
+        })?;
 
     let users: Vec<User> = rows
         .into_iter()
@@ -45,7 +50,7 @@ pub async fn the_user(
 pub async fn users(
     State(pool): State<PgPool>,
     Query(params): Query<HashMap<String, String>>,
-) -> Result<impl IntoResponse, (StatusCode, String)> {
+) -> Result<impl IntoResponse, (StatusCode, Json<ApiErrorResponse>)> {
     if let Some(page) = params.get("page") {
         let query_str = r#"
         select * from users order by user_id limit 10 offset ($1::INT - 1)*10"#;
@@ -54,7 +59,12 @@ pub async fn users(
             .bind(page)
             .fetch_all(&pool)
             .await
-            .map_err(|err| (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()))?;
+            .map_err(|err| {
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    Json(ApiErrorResponse::from_internal_error(err)),
+                )
+            })?;
 
         let users: Vec<User> = rows
             .into_iter()
@@ -72,7 +82,9 @@ pub async fn users(
     } else {
         Err((
             StatusCode::BAD_REQUEST,
-            "Missing required query parameter: page".to_string(),
+            Json(ApiErrorResponse::from_bad_request(
+                "Missing required query parameter: page",
+            )),
         ))
     }
 }
@@ -80,7 +92,7 @@ pub async fn users(
 pub async fn the_post(
     State(pool): State<PgPool>,
     Path(id): Path<i32>,
-) -> Result<impl IntoResponse, (StatusCode, String)> {
+) -> Result<impl IntoResponse, (StatusCode, Json<ApiErrorResponse>)> {
     let query_str = r#"
         select p.*, u.first_name || ' ' || u.last_name as author
         from posts p
@@ -92,7 +104,12 @@ pub async fn the_post(
         .bind(id)
         .fetch_all(&pool)
         .await
-        .map_err(|err| (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()))?;
+        .map_err(|err| {
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(ApiErrorResponse::from_internal_error(err)),
+            )
+        })?;
 
     let posts: Vec<Post> = rows
         .into_iter()
@@ -114,7 +131,7 @@ pub async fn the_post(
 pub async fn posts(
     State(pool): State<PgPool>,
     Query(params): Query<HashMap<String, String>>,
-) -> Result<impl IntoResponse, (StatusCode, String)> {
+) -> Result<impl IntoResponse, (StatusCode, Json<ApiErrorResponse>)> {
     if let Some(page) = params.get("page") {
         let query_str = r#"
         select p.*, u.first_name || ' ' || u.last_name as author
@@ -129,7 +146,12 @@ pub async fn posts(
             .bind(page)
             .fetch_all(&pool)
             .await
-            .map_err(|err| (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()))?;
+            .map_err(|err| {
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    Json(ApiErrorResponse::from_internal_error(err)),
+                )
+            })?;
 
         let posts: Vec<Post> = rows
             .into_iter()
@@ -149,15 +171,18 @@ pub async fn posts(
     } else {
         Err((
             StatusCode::BAD_REQUEST,
-            "Missing required query parameter: page".to_string(),
+            Json(ApiErrorResponse::from_bad_request(
+                "Missing required query parameter: page",
+            )),
         ))
     }
 }
 
+//Confirm whether the account has been registered
 pub async fn account(
     State(pool): State<PgPool>,
     Path(account): Path<String>,
-) -> Result<impl IntoResponse, (StatusCode, String)> {
+) -> Result<impl IntoResponse, (StatusCode, Json<ApiErrorResponse>)> {
     let query_str = r#"
         select account_id from accounts where account = $1
     "#;
@@ -166,35 +191,49 @@ pub async fn account(
         .bind(&account)
         .fetch_all(&pool)
         .await
-        .map_err(|err| (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()))?;
+        .map_err(|err| {
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(ApiErrorResponse::from_internal_error(err)),
+            )
+        })?;
 
     if row.is_empty() {
-        Ok((StatusCode::OK, "{\"result\": \"ok\"}"))
+        Ok((StatusCode::OK, Json(ApiResponse::from_ok("1".into()))))
     } else {
-        Ok((StatusCode::OK, "{\"result\": \"deny\"}"))
+        Ok((StatusCode::OK, Json(ApiResponse::from_deny("0".into()))))
     }
 }
 
 pub async fn auth(
     jar: CookieJar,
     Extension(session_manager): Extension<Arc<SessionManager>>,
-) -> Result<impl IntoResponse, (StatusCode, String)> {
+) -> Result<impl IntoResponse, (StatusCode, Json<ApiErrorResponse>)> {
     if let Some(session_cookie) = jar.get("session_id") {
         let session_id = session_cookie.value();
 
         match session_manager.check_auth(session_id).await {
-            Some(_) => return Ok((StatusCode::OK, "session authenticated".to_string())),
+            Some(_) => {
+                return Ok((
+                    StatusCode::OK,
+                    Json(ApiResponse::from_ok("session authenticated".into())),
+                ));
+            }
             None => {
                 return Err((
                     StatusCode::UNAUTHORIZED,
-                    "session unauthenticated".to_string(),
+                    Json(ApiErrorResponse::from_unauthorized(
+                        "session unauthenticated",
+                    )),
                 ));
             }
         }
     } else {
         return Err((
             StatusCode::UNAUTHORIZED,
-            "Invalid Session ID Header".to_string(),
+            Json(ApiErrorResponse::from_unauthorized(
+                "Invalid Session ID Header",
+            )),
         ));
     }
 }
@@ -202,23 +241,32 @@ pub async fn auth(
 pub async fn logout(
     Extension(session_manager): Extension<Arc<SessionManager>>,
     jar: CookieJar,
-) -> Result<impl IntoResponse, (StatusCode, String)> {
+) -> Result<impl IntoResponse, (StatusCode, Json<ApiErrorResponse>)> {
     if let Some(session_cookie) = jar.get("session_id") {
         let session_id = session_cookie.value();
 
         match session_manager.delete_session(session_id).await {
-            Some(_) => return Ok((StatusCode::OK, "User has been logout".to_string())),
+            Some(_) => {
+                return Ok((
+                    StatusCode::OK,
+                    Json(ApiResponse::from_ok("User has been logout".into())),
+                ));
+            }
             None => {
                 return Err((
                     StatusCode::UNAUTHORIZED,
-                    "session unauthenticated".to_string(),
+                    Json(ApiErrorResponse::from_unauthorized(
+                        "session unauthenticated",
+                    )),
                 ));
             }
         }
     } else {
         return Err((
             StatusCode::UNAUTHORIZED,
-            "Invalid Session ID Header".to_string(),
+            Json(ApiErrorResponse::from_unauthorized(
+                "Invalid Session ID Header",
+            )),
         ));
     }
 }

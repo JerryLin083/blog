@@ -75,8 +75,47 @@ pub(crate) struct ApiErrorResponse {
     message: String,
 }
 
+impl ApiErrorResponse {
+    pub fn from_internal_error(err: impl ToString) -> ApiErrorResponse {
+        ApiErrorResponse {
+            error: "Server internal error".into(),
+            message: err.to_string(),
+        }
+    }
+
+    pub fn from_bad_request(message: &str) -> ApiErrorResponse {
+        ApiErrorResponse {
+            error: "Bad request".into(),
+            message: message.into(),
+        }
+    }
+
+    pub fn from_unauthorized(message: &str) -> ApiErrorResponse {
+        ApiErrorResponse {
+            error: "Unauthorized".into(),
+            message: message.into(),
+        }
+    }
+}
+
 #[derive(Serialize)]
 pub(crate) struct ApiResponse {
     status: String,
     result: String,
+}
+
+impl ApiResponse {
+    pub fn from_ok(result: String) -> ApiResponse {
+        ApiResponse {
+            status: "Ok".into(),
+            result,
+        }
+    }
+
+    pub fn from_deny(result: String) -> ApiResponse {
+        ApiResponse {
+            status: "Deny".into(),
+            result,
+        }
+    }
 }

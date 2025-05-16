@@ -6,13 +6,13 @@ use axum::{
 };
 use sqlx::PgPool;
 
-use super::{PostRequest, UserRequest};
+use super::{ApiErrorResponse, ApiResponse, PostRequest, UserRequest};
 
 pub async fn patch_user(
     State(pool): State<PgPool>,
     Path(id): Path<i32>,
     Json(user): Json<UserRequest>,
-) -> Result<impl IntoResponse, (StatusCode, String)> {
+) -> Result<impl IntoResponse, (StatusCode, Json<ApiErrorResponse>)> {
     let query_str = r#"
         update users set
         first_name = $1,
@@ -23,7 +23,7 @@ pub async fn patch_user(
         where user_id = $6
       "#;
 
-    let result = sqlx::query(query_str)
+    let rows_affected = sqlx::query(query_str)
         .bind(&user.first_name)
         .bind(&user.last_name)
         .bind(&user.email)
@@ -32,16 +32,24 @@ pub async fn patch_user(
         .bind(id)
         .execute(&pool)
         .await
-        .map_err(|err| (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()))?
+        .map_err(|err| {
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(ApiErrorResponse::from_internal_error(err)),
+            )
+        })?
         .rows_affected();
 
-    Ok((StatusCode::OK, result.to_string()))
+    Ok((
+        StatusCode::OK,
+        Json(ApiResponse::from_ok(rows_affected.to_string())),
+    ))
 }
 
 pub async fn publish_post(
     State(pool): State<PgPool>,
     Path(id): Path<i32>,
-) -> Result<impl IntoResponse, (StatusCode, String)> {
+) -> Result<impl IntoResponse, (StatusCode, Json<ApiErrorResponse>)> {
     let query_str = r#"
       update posts set
       update_at = NOW(),
@@ -49,14 +57,22 @@ pub async fn publish_post(
       where id = $1
     "#;
 
-    let result = sqlx::query(query_str)
+    let rows_affected = sqlx::query(query_str)
         .bind(id)
         .execute(&pool)
         .await
-        .map_err(|err| (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()))?
+        .map_err(|err| {
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(ApiErrorResponse::from_internal_error(err)),
+            )
+        })?
         .rows_affected();
 
-    Ok((StatusCode::OK, result.to_string()))
+    Ok((
+        StatusCode::OK,
+        Json(ApiResponse::from_ok(rows_affected.to_string())),
+    ))
 }
 
 //TODO: update post by id
@@ -64,7 +80,7 @@ pub async fn edit_post(
     State(pool): State<PgPool>,
     Path(id): Path<i32>,
     Json(post): Json<PostRequest>,
-) -> Result<impl IntoResponse, (StatusCode, String)> {
+) -> Result<impl IntoResponse, (StatusCode, Json<ApiErrorResponse>)> {
     let query_str = r#"
         update posts set 
         title = $1,
@@ -73,14 +89,22 @@ pub async fn edit_post(
         where id = $3
     "#;
 
-    let result = sqlx::query(query_str)
+    let rows_affected = sqlx::query(query_str)
         .bind(&post.title)
         .bind(&post.content)
         .bind(id)
         .execute(&pool)
         .await
-        .map_err(|err| (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()))?
+        .map_err(|err| {
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(ApiErrorResponse::from_internal_error(err)),
+            )
+        })?
         .rows_affected();
 
-    Ok((StatusCode::OK, result.to_string()))
+    Ok((
+        StatusCode::OK,
+        Json(ApiResponse::from_ok(rows_affected.to_string())),
+    ))
 }
