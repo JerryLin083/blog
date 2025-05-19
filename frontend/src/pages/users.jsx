@@ -22,11 +22,14 @@ function Users() {
     setIsLoading(true);
     try {
       let res = await fetch(`/api/users?page=${currentPage}`);
+      if (!res.ok) {
+        throw new Error(`Failed to fetch data ${res.status}`);
+      }
       let users = await res.json();
-
       setUsers(users);
       setIsLoading(false);
     } catch (e) {
+      console.error(e);
       navigate("/not-found", { replace: true });
       return;
     }

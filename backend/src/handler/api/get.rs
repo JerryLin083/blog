@@ -53,7 +53,17 @@ pub async fn users(
 ) -> Result<impl IntoResponse, (StatusCode, Json<ApiErrorResponse>)> {
     if let Some(page) = params.get("page") {
         let query_str = r#"
-        select * from users order by user_id limit 10 offset ($1::INT - 1)*10"#;
+            select 
+                user_id, 
+                COALESCE(first_name, ''),
+                COALESCE(last_name, ''),
+                COALESCE(email, ''), 
+                COALESCE(phone, ''), 
+                COALESCE(address, '')   
+            from users 
+            order by user_id 
+            limit 10 offset ($1::INT - 1)*10
+            "#;
 
         let rows = sqlx::query(query_str)
             .bind(page)

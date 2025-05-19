@@ -18,9 +18,13 @@ function Post() {
     setIsLoading(true);
     try {
       let res = await fetch(`/api/posts/${params.id}`);
+      if (!res.ok) {
+        throw new Error(`Failed to fetch data ${res.status}`);
+      }
+
       let post = await res.json();
 
-      if (post.isEmpty) {
+      if (post.length === 0) {
         navigate("/not_found", { replace: true });
         return;
       }
@@ -28,6 +32,7 @@ function Post() {
       setPost(post[0]);
       setIsLoading(false);
     } catch (e) {
+      console.error(e);
       navigate("/not-found", { replace: true });
 
       return;

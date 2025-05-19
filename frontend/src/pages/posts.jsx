@@ -21,12 +21,17 @@ function Posts() {
     }
 
     setIsLoading(true);
-    let res = await fetch(`/api/posts?page=${currentPage}`);
     try {
+      let res = await fetch(`/api/posts?page=${currentPage}`);
+      if (!res.ok) {
+        throw new Error(`Failed to fetch data: ${res.status}`);
+      }
+
       let posts = await res.json();
       setPosts(posts);
       setIsLoading(false);
     } catch (e) {
+      console.error(e);
       navigate("/not-found", { replace: true });
       return;
     }

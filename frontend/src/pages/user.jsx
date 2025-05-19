@@ -19,9 +19,13 @@ function User() {
     setIsLoading(true);
     try {
       let res = await fetch(`/api/users/${params.id}`);
+      if (!res.ok) {
+        throw new Error(`Failed to fetch data ${res.status}`);
+      }
+
       let user = await res.json();
 
-      if (user.isEmpty) {
+      if (user.length === 0) {
         navigate("/not_found", { replace: true });
         return;
       }
@@ -29,6 +33,7 @@ function User() {
       setUser(user[0]);
       setIsLoading(false);
     } catch (e) {
+      console.error(e);
       navigate("/not_found", { replace: true });
       return;
     }

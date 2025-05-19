@@ -22,7 +22,7 @@ pub async fn create_post(
         let session_id = session_cookie.value();
         match session_manager.check_session_id(session_id).await {
             Some(session) => {
-                let user_id_from_session = session.user_id.to_string();
+                let user_id_from_session = session.user_id;
                 let query_str = r#"
                     insert into posts(title, content, user_id)
                     values($1, $2, $3)
@@ -47,20 +47,18 @@ pub async fn create_post(
                 //send new post id back to client
                 Ok(Json(ApiResponse::from_ok(post_id.to_string())))
             }
-            None => {
-                return Err((
-                    StatusCode::UNAUTHORIZED,
-                    Json(ApiErrorResponse::from_unauthorized("session was expired")),
-                ));
-            }
+            None => Err((
+                StatusCode::UNAUTHORIZED,
+                Json(ApiErrorResponse::from_unauthorized("session was expired")),
+            )),
         }
     } else {
-        return Err((
+        Err((
             StatusCode::UNAUTHORIZED,
             Json(ApiErrorResponse::from_unauthorized(
                 "Authentication required",
             )),
-        ));
+        ))
     }
 }
 
