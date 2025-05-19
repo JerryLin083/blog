@@ -223,28 +223,80 @@ pub async fn auth(
         let session_id = session_cookie.value();
 
         match session_manager.check_auth(session_id).await {
-            Some(_) => {
-                return Ok((
-                    StatusCode::OK,
-                    Json(ApiResponse::from_ok("session authenticated".into())),
-                ));
-            }
-            None => {
-                return Err((
-                    StatusCode::UNAUTHORIZED,
-                    Json(ApiErrorResponse::from_unauthorized(
-                        "session unauthenticated",
-                    )),
-                ));
-            }
+            Some(_) => Ok((
+                StatusCode::OK,
+                Json(ApiResponse::from_ok("session authenticated".into())),
+            )),
+            None => Err((
+                StatusCode::UNAUTHORIZED,
+                Json(ApiErrorResponse::from_unauthorized(
+                    "session unauthenticated",
+                )),
+            )),
         }
     } else {
-        return Err((
+        Err((
             StatusCode::UNAUTHORIZED,
             Json(ApiErrorResponse::from_unauthorized(
                 "Invalid Session ID Header",
             )),
-        ));
+        ))
+    }
+}
+
+pub async fn auth_user(
+    State(pool): State<PgPool>,
+    Extension(session_manager): Extension<Arc<SessionManager>>,
+    jar: CookieJar,
+) -> Result<impl IntoResponse, (StatusCode, Json<ApiErrorResponse>)> {
+    if let Some(session_cookie) = jar.get("session_id") {
+        let session_id = session_cookie.value();
+
+        match session_manager.check_session_id(session_id).await {
+            Some(session) => {
+                let query_str = r#"
+                    select * from users where user_id = $1
+                "#;
+
+                let rows = sqlx::query(query_str)
+                    .bind(session.user_id)
+                    .fetch_all(&pool)
+                    .await
+                    .map_err(|err| {
+                        (
+                            StatusCode::INTERNAL_SERVER_ERROR,
+                            Json(ApiErrorResponse::from_internal_error(err)),
+                        )
+                    })?;
+
+                let users: Vec<User> = rows
+                    .into_iter()
+                    .map(|row| User {
+                        id: row.get(0),
+                        first_name: row.get(1),
+                        last_name: row.get(2),
+                        email: row.get(3),
+                        phone: row.get(4),
+                        address: row.get(5),
+                    })
+                    .collect();
+
+                Ok((StatusCode::OK, Json(users)))
+            }
+            None => Err((
+                StatusCode::UNAUTHORIZED,
+                Json(ApiErrorResponse::from_unauthorized(
+                    "session unauthenticated",
+                )),
+            )),
+        }
+    } else {
+        Err((
+            StatusCode::UNAUTHORIZED,
+            Json(ApiErrorResponse::from_unauthorized(
+                "Invalid Session ID Header",
+            )),
+        ))
     }
 }
 

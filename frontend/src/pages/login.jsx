@@ -1,16 +1,16 @@
 import { createSignal } from "solid-js";
-import { useNavigate } from "@solidjs/router";
 import "./login.css";
 
 function Login() {
   const [account, setAccount] = createSignal("");
   const [password, setPassword] = createSignal("");
-
-  const navigate = useNavigate();
+  const [logging, setLogging] = createSignal(false);
+  const [isFail, setIsFail] = createSignal(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    setLogging(true);
     try {
       let loginJsonBody = {
         account: account(),
@@ -26,13 +26,14 @@ function Login() {
       });
 
       if (res.ok) {
-        navigate("/");
+        window.location.assign("/");
       } else {
-        const errorData = await res.json();
-        console.error("Login failed: ", errorData);
+        throw new Error(`Failed to fetch data: ${res.status}`);
       }
     } catch (e) {
-      console.log(e);
+      console.error(e);
+      setIsFail(true);
+      setLogging(false);
     }
   };
 
@@ -60,8 +61,10 @@ function Login() {
             }}
           />
         </div>
-
-        <button>Login</button>
+        {isFail() ? (
+          <p style="color: red; font-size: small">Login failed</p>
+        ) : null}
+        {logging() ? <p>Logging in ...</p> : <button>Login</button>}
       </form>
     </div>
   );

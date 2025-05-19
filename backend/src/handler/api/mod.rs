@@ -6,6 +6,7 @@ use serde::Serialize;
 mod get;
 pub use get::account;
 pub use get::auth;
+pub use get::auth_user;
 pub use get::logout;
 pub use get::posts;
 pub use get::the_post;

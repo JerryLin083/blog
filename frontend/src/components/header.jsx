@@ -1,41 +1,30 @@
 import "./header.css";
-import { A, useNavigate } from "@solidjs/router";
+import { A } from "@solidjs/router";
 import { createSignal, onMount } from "solid-js";
 
 import blog from "../assets/icons-blog.svg";
-import logout from "../assets/icons-logout.svg";
+import sloth_avatar from "../assets/icons-avatar-sloth.svg";
+import avacado_avatar from "../assets/icons-avatar-avacado.svg";
+import Setting from "./setting";
 
 function Header() {
   const [auth, setAuth] = createSignal(true);
-  const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    try {
-      let res = await fetch("/api/logout");
-
-      if (res.ok) {
-        setAuth(false);
-        navigate("/");
-      } else {
-        console.log(res);
-      }
-    } catch (e) {
-      console.error("Logout failed: ", e);
-    }
-  };
+  const [user, setUser] = createSignal({});
+  const [toggle, setToggle] = createSignal(false);
 
   onMount(async () => {
     try {
-      let res = await fetch("/api/auth");
+      let res = await fetch("/api/auth/user");
       if (res.ok) {
+        let user = await res.json();
+
+        setUser(user[0]);
         setAuth(true);
       } else {
-        let msg = await res.text();
-        console.log(msg);
-        setAuth(false);
+        throw new Error(`Failed to fetch data: ${res.status}`);
       }
     } catch (e) {
-      console.error("Fetch auth failed: ", e);
+      console.error(e);
       setAuth(false);
     }
   });
@@ -57,10 +46,20 @@ function Header() {
             Users
           </A>
           {auth() ? (
-            <div onClick={handleLogout} class="logout-block">
-              <img src={logout} height="48" width="48">
-                Logout
-              </img>
+            // TODO: use user avatar which can logout or setting user infomation
+            <div class="setting-container">
+              {toggle() ? (
+                <Setting toggle={setToggle} user={user()} />
+              ) : (
+                <div class="avatar-block" onClick={() => setToggle(!toggle())}>
+                  <img
+                    src={user().id % 2 == 0 ? sloth_avatar : avacado_avatar}
+                    height="48"
+                    width="48"
+                    alt="avatar"
+                  />
+                </div>
+              )}
             </div>
           ) : (
             <A href="/login" class="link">

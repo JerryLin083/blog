@@ -1,10 +1,11 @@
+import { A } from "@solidjs/router";
+
 import "./user_card.css";
 import avacado_avatar from "../assets/icons-avatar-avacado.svg";
 import sloth_avatar from "../assets/icons-avatar-sloth.svg";
 import email from "../assets/icons-email.svg";
 import phone from "../assets/icons-phone.svg";
 import address from "../assets/icons-home.svg";
-import { A } from "@solidjs/router";
 
 function UserCard(props) {
   const user = props.user;

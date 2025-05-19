@@ -3,6 +3,7 @@ mod api;
 //get
 pub(crate) use api::account;
 pub(crate) use api::auth;
+pub(crate) use api::auth_user;
 pub(crate) use api::logout;
 pub(crate) use api::posts;
 pub(crate) use api::the_post;
