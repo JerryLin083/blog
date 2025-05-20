@@ -131,7 +131,7 @@ pub async fn the_post(
             create_at: row.get(4),
             update_at: row.get(5),
             published_at: row.get(6),
-            author: row.try_get(7).unwrap_or("".to_string()),
+            author: row.try_get(7).unwrap_or("".into()),
         })
         .collect();
 
@@ -144,13 +144,13 @@ pub async fn posts(
 ) -> Result<impl IntoResponse, (StatusCode, Json<ApiErrorResponse>)> {
     if let Some(page) = params.get("page") {
         let query_str = r#"
-        select p.*, u.first_name || ' ' || u.last_name as author
-        from posts p
-        left join users u on u.user_id = p.user_id
-        where p.published_at is not null
-        order by p.create_at desc 
-        limit 10 offset ($1::INT - 1) * 10
-    "#;
+            select p.*, u.first_name || ' ' || u.last_name as author
+            from posts p
+            left join users u on u.user_id = p.user_id
+            where p.published_at is not null
+            order by p.create_at desc 
+            limit 10 offset ($1::INT - 1) * 10
+        "#;
 
         let rows = sqlx::query(query_str)
             .bind(page)
@@ -173,7 +173,7 @@ pub async fn posts(
                 create_at: row.get(4),
                 update_at: row.get(5),
                 published_at: row.get(6),
-                author: row.try_get(7).unwrap_or("".to_string()),
+                author: row.try_get(7).unwrap_or("".into()),
             })
             .collect();
 
@@ -183,6 +183,75 @@ pub async fn posts(
             StatusCode::BAD_REQUEST,
             Json(ApiErrorResponse::from_bad_request(
                 "Missing required query parameter: page",
+            )),
+        ))
+    }
+}
+
+pub async fn myPosts(
+    State(pool): State<PgPool>,
+    Query(params): Query<HashMap<String, String>>,
+    Extension(session_manager): Extension<Arc<SessionManager>>,
+    jar: CookieJar,
+) -> Result<impl IntoResponse, (StatusCode, Json<ApiErrorResponse>)> {
+    if let Some(session_cookie) = jar.get("session_id") {
+        let session_id = session_cookie.value();
+
+        match session_manager.check_session_id(session_id).await {
+            Some(session) => {
+                if let Some(page) = params.get("page") {
+                    let query_str = r#"
+                        select * from posts where user_id = $1
+                        order by create_at, published_at NULLS first
+                        limit 10 offset ($2::INT - 1) *10
+                    "#;
+
+                    let rows = sqlx::query(query_str)
+                        .bind(session.user_id)
+                        .bind(page)
+                        .fetch_all(&pool)
+                        .await
+                        .map_err(|err| {
+                            (
+                                StatusCode::INTERNAL_SERVER_ERROR,
+                                Json(ApiErrorResponse::from_internal_error(err)),
+                            )
+                        })?;
+
+                    let posts: Vec<Post> = rows
+                        .into_iter()
+                        .map(|row| Post {
+                            id: row.get(0),
+                            title: row.get(1),
+                            content: row.get(2),
+                            user_id: row.get(3),
+                            create_at: row.get(4),
+                            update_at: row.get(5),
+                            published_at: row.try_get(6).unwrap_or(None),
+                            author: row.try_get(7).unwrap_or("".into()),
+                        })
+                        .collect();
+
+                    Ok((StatusCode::OK, Json(posts)))
+                } else {
+                    Err((
+                        StatusCode::BAD_REQUEST,
+                        Json(ApiErrorResponse::from_bad_request(
+                            "Missing required query parameter: page",
+                        )),
+                    ))
+                }
+            }
+            None => Err((
+                StatusCode::UNAUTHORIZED,
+                Json(ApiErrorResponse::from_unauthorized("Session was expired")),
+            )),
+        }
+    } else {
+        Err((
+            StatusCode::UNAUTHORIZED,
+            Json(ApiErrorResponse::from_unauthorized(
+                "Invalid Session ID Header",
             )),
         ))
     }

@@ -1,0 +1,30 @@
+.new-post-container h4 {
+  font-family: "Tagesschrift", system-ui;
+  font-size: 1.5rem;
+  color: rgb(252, 188, 12);
+  margin-bottom: 0;
+}
+
+.new-post-container textarea {
+  width: 630px;
+  resize: none;
+  font-size: x-large;
+}
+
+.submit-button {
+  margin-top: 1.5rem;
+}
+
+.submit-button button {
+  background-color: #454545;
+  color: rgb(252, 188, 12);
+  padding: 0.5rem 0.8rem;
+}
+
+#title {
+  height: 40px;
+}
+
+#content {
+  height: 380px;
+}

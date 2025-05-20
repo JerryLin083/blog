@@ -13,3 +13,12 @@
 .posts-container {
   overflow-y: scroll;
 }
+
+.posts-header {
+  position: fixed;
+  top: 10rem;
+  right: 8rem;
+  display: flex;
+  justify-content: right;
+  align-items: center;
+}

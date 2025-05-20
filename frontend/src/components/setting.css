@@ -4,7 +4,7 @@
   top: 0;
   right: 0;
   width: 350px;
-  height: 400px;
+  height: 450px;
   border-radius: 10px;
   padding: 0.5rem;
   box-shadow: 0.3rem -0.2rem rgb(118, 111, 91);
@@ -43,10 +43,22 @@
   align-items: center;
 }
 
-.setting-info > h4 {
+.setting-info h4 {
   font-family: "Tagesschrift", system-ui;
   font-size: 1.5rem;
   color: rgb(252, 188, 12);
+}
+
+.user-name {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.user-name > div {
+  margin: 1.5rem;
 }
 
 .user-edit {
@@ -56,5 +68,22 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  font-size: 12px;
+  font-family: "Tagesschrift", system-ui;
+}
+
+.user-edit > div {
+  font-size: 18px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.edit-button {
+  margin-top: 0.8rem;
+}
+
+.edit-button button {
+  background-color: #454545;
+  color: greenyellow;
+  padding: 0.5rem 0.8rem;
 }

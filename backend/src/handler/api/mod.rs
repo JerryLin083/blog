@@ -8,6 +8,7 @@ pub use get::account;
 pub use get::auth;
 pub use get::auth_user;
 pub use get::logout;
+pub use get::myPosts;
 pub use get::posts;
 pub use get::the_post;
 pub use get::the_user;
@@ -61,7 +62,7 @@ pub(crate) struct Post {
     author: String,
     create_at: DateTime<Utc>,
     update_at: DateTime<Utc>,
-    published_at: DateTime<Utc>,
+    published_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Deserialize)]

@@ -64,7 +64,7 @@ function Login() {
         {isFail() ? (
           <p style="color: red; font-size: small">Login failed</p>
         ) : null}
-        {logging() ? <p>Logging in ...</p> : <button>Login</button>}
+        {logging() ? <p>Waiting...</p> : <button>Login</button>}
       </form>
     </div>
   );
