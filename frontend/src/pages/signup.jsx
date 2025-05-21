@@ -30,26 +30,24 @@ function SignUp() {
         password: password(),
       };
 
-      //TODO: Confirm whether the account has been registered
       let accountRes = await fetch(`/api/account/${account()}`);
       let accountResult = await accountRes.json();
 
       if (accountResult.result === "ok") {
-        //TODO: create new account;
-        // let res = await fetch("/api/signup", {
-        //   method: "POST",
-        //   body: JSON.stringify(signUpJsonBody),
-        //   headers: {
-        //     "Content-Type": "application/json",
-        //   },
-        // });
+        let res = await fetch("/api/signup", {
+          method: "POST",
+          body: JSON.stringify(signUpJsonBody),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
-        // if (res.ok) {
-        //   navigate("/");
-        // } else {
-        //   const errorData = await res.json();
-        //   console.error("Signup failed: ", errorData);
-        // }
+        if (res.ok) {
+          navigate("/");
+        } else {
+          const errorData = await res.json();
+          console.error("Signup failed: ", errorData);
+        }
 
         console.log("account created");
       } else {

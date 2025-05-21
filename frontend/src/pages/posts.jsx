@@ -4,8 +4,6 @@ import { createSignal, createEffect, onMount } from "solid-js";
 import "./posts.css";
 import PostCard from "../components/post_card";
 import Loading from "../components/loading";
-import post_icon from "../assets/icons-post.svg";
-import login_icon from "../assets/icons-login.svg";
 
 function Posts() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -13,7 +11,6 @@ function Posts() {
 
   const [isLoading, setIsLoading] = createSignal(false);
   const [posts, setPosts] = createSignal([]);
-  const [auth, setAuth] = createSignal(false);
 
   const page = () => searchParams.page;
 
@@ -44,28 +41,12 @@ function Posts() {
     setSearchParams({ page: newPage });
   };
 
-  onMount(async () => {
-    let auth_res = await fetch("api/auth");
-    if (auth_res.ok) {
-      setAuth(true);
-    } else {
-      throw new Error(`Authorize failed ${res.status}`);
-    }
-  });
-
   return (
     <>
       {isLoading() ? (
         <Loading />
       ) : (
         <div class="pixel-container posts-container">
-          <div class="posts-header">
-            {auth() ? (
-              <button onClick={() => navigate("/posts/new")}>
-                <img src={post_icon} height="36" width="36" alt="new post" />
-              </button>
-            ) : null}
-          </div>
           <ul class="post-list">
             <For each={posts()}>{(post, _) => <PostCard post={post} />}</For>
           </ul>

@@ -8,7 +8,7 @@ pub use get::account;
 pub use get::auth;
 pub use get::auth_user;
 pub use get::logout;
-pub use get::myPosts;
+pub use get::my_posts;
 pub use get::posts;
 pub use get::the_post;
 pub use get::the_user;

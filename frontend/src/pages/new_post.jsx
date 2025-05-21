@@ -14,7 +14,7 @@ function NewPost() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (title.length == 0 || content.length == 0) {
+    if (title().length == 0 || content().length == 0) {
       setEmpty(true);
       return;
     }

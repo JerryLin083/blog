@@ -8,6 +8,7 @@
   border-radius: 10px;
   padding: 0.5rem;
   box-shadow: 0.3rem -0.2rem rgb(118, 111, 91);
+  z-index: 3000;
 }
 
 .setting button {

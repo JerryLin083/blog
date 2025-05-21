@@ -33,20 +33,21 @@ function Header() {
     <header class="header">
       <nav class="nav_bar">
         <div>
-          <img src={blog} alt="logo" width="64" height="64" />
+          <A href="/">
+            <img src={blog} alt="logo" width="64" height="64" />
+          </A>
         </div>
         <div class="nav_link">
-          <A href="/" class="link">
-            Home
-          </A>
           <A href="/posts?page=1" class="link">
             Posts
           </A>
           <A href="/users?page=1" class="link">
             Users
           </A>
+          <A href="/posts/myposts?page=1" class="link">
+            My Posts
+          </A>
           {auth() ? (
-            // TODO: use user avatar which can logout or setting user infomation
             <div class="setting-container">
               {toggle() ? (
                 <Setting toggle={setToggle} user={user()} />

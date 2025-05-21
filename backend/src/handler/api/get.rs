@@ -188,7 +188,7 @@ pub async fn posts(
     }
 }
 
-pub async fn myPosts(
+pub async fn my_posts(
     State(pool): State<PgPool>,
     Query(params): Query<HashMap<String, String>>,
     Extension(session_manager): Extension<Arc<SessionManager>>,
@@ -202,7 +202,7 @@ pub async fn myPosts(
                 if let Some(page) = params.get("page") {
                     let query_str = r#"
                         select * from posts where user_id = $1
-                        order by create_at, published_at NULLS first
+                        order by published_at DESC NULLS first, create_at
                         limit 10 offset ($2::INT - 1) *10
                     "#;
 

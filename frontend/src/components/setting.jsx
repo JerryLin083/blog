@@ -8,13 +8,15 @@ import phone_icon from "../assets/icons-phone.svg";
 import address_icon from "../assets/icons-home.svg";
 import edit from "../assets/icons-edit.svg";
 import { createSignal } from "solid-js";
+import { useNavigate } from "@solidjs/router";
 
 function Setting(props) {
   let toggle = props.toggle;
   let user = props.user;
 
-  let [submitting, setSubmitting] = createSignal(false);
+  const navigate = useNavigate();
 
+  let [submitting, setSubmitting] = createSignal(false);
   let [infoEdit, setInfoEdit] = createSignal({
     username: true,
     email: true,
@@ -31,14 +33,13 @@ function Setting(props) {
   const handleLogout = async () => {
     try {
       let res = await fetch("/api/logout");
-
-      if (res.ok) {
-        window.location.assign("/");
-      } else {
+      if (!res.ok) {
         throw new Error(`Failed to fetch data: ${res.status}`);
       }
     } catch (e) {
       console.error(e);
+    } finally {
+      window.location.assign("/");
     }
   };
 

@@ -6,7 +6,7 @@ use sqlx::{Pool, Postgres};
 
 use crate::handler::{
     account, auth, auth_user, create_post, delete_post, delete_user, edit_post, login, logout,
-    myPosts, patch_user, posts, publish_post, signup, the_post, the_user, users,
+    my_posts, patch_user, posts, publish_post, signup, the_post, the_user, users,
 };
 
 pub fn api_router() -> Router<Pool<Postgres>> {
@@ -15,7 +15,7 @@ pub fn api_router() -> Router<Pool<Postgres>> {
         .route("/users/{id}", get(the_user))
         .route("/posts", get(posts))
         .route("/posts/{id}", get(the_post))
-        .route("/posts/myposts", get(myPosts))
+        .route("/posts/myposts", get(my_posts))
         .route("/account/{account}", get(account))
         .route("/logout", get(logout))
         .route("/auth", get(auth))

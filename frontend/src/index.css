@@ -64,6 +64,7 @@ button:focus-visible {
   font-family: "Press Start 2P", cursive; /* 像素字體，你需要引入 */
   background-color: black;
   padding: 20px;
+  overflow-y: scroll;
 }
 
 .pixel-title {

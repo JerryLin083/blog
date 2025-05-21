@@ -97,7 +97,7 @@ pub async fn signup(
     let session_id = session_manager.create_session(user_id).await;
 
     //set session cookie
-    let cookie_value = format!("session_id={}; HttpOnly; Path=/", session_id);
+    let cookie_value = format!("session_id={}; HttpOnly; Path=/; Secure", session_id);
 
     let mut headers = HeaderMap::new();
     headers.insert("Set-Cookie", HeaderValue::from_str(&cookie_value).unwrap());
@@ -141,7 +141,7 @@ pub async fn login(
     let session_id = session_manager.create_session(user_id).await;
 
     //set session cookie
-    let cookie_value = format!("session_id={}; HttpOnly; Path=/", session_id);
+    let cookie_value = format!("session_id={}; HttpOnly; Path=/; Secure", session_id);
 
     let mut headers = HeaderMap::new();
     headers.insert("Set-Cookie", HeaderValue::from_str(&cookie_value).unwrap());

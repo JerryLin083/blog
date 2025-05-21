@@ -1,5 +1,5 @@
 import { A, useNavigate, useParams } from "@solidjs/router";
-import { createEffect, createSignal } from "solid-js";
+import { createEffect, createSignal, onMount } from "solid-js";
 
 import "./post.css";
 import Loading from "../components/loading";
@@ -14,7 +14,7 @@ function Post() {
 
   let post_published_date = () => new Date(post()?.published_at);
 
-  createEffect(async () => {
+  onMount(async () => {
     setIsLoading(true);
     try {
       let res = await fetch(`/api/posts/${params.id}`);
