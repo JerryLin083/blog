@@ -1,11 +1,8 @@
 import { createSignal } from "solid-js";
-import { useNavigate } from "@solidjs/router";
 
 import "./signup.css";
 
 function SignUp() {
-  const navigate = useNavigate();
-
   const [account, setAccount] = createSignal("");
   const [password, setPassword] = createSignal("");
   const [confirmPassword, setConfirmPassword] = createSignal("");
@@ -31,34 +28,34 @@ function SignUp() {
       };
 
       let accountRes = await fetch(`/api/account/${account()}`);
-      let accountResult = await accountRes.json();
+      if (accountRes.ok) {
+        let accountResult = await accountRes.json();
+        if (accountResult.result == "1") {
+          let res = await fetch("/api/signup", {
+            method: "POST",
+            body: JSON.stringify(signUpJsonBody),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
 
-      if (accountResult.result === "ok") {
-        let res = await fetch("/api/signup", {
-          method: "POST",
-          body: JSON.stringify(signUpJsonBody),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (res.ok) {
-          navigate("/");
+          if (res.ok) {
+            window.location.assign("/");
+          } else {
+            throw new Error(`Failed to create account: ${res.status}`);
+          }
         } else {
-          const errorData = await res.json();
-          console.error("Signup failed: ", errorData);
+          setIsAccountExist(true);
         }
-
-        console.log("account created");
       } else {
-        setIsAccountExist(true);
+        throw new Error(`Failed to check account: ${accountRes.status}`);
       }
     } catch (e) {
-      console.log(e);
+      console.error(e);
+    } finally {
+      setIsSubmit(false);
+      setIsEqual(true);
     }
-
-    setIsSubmit(false);
-    setIsEqual(true);
   };
 
   return (

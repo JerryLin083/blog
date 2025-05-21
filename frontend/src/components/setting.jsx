@@ -8,13 +8,10 @@ import phone_icon from "../assets/icons-phone.svg";
 import address_icon from "../assets/icons-home.svg";
 import edit from "../assets/icons-edit.svg";
 import { createSignal } from "solid-js";
-import { useNavigate } from "@solidjs/router";
 
 function Setting(props) {
   let toggle = props.toggle;
   let user = props.user;
-
-  const navigate = useNavigate();
 
   let [submitting, setSubmitting] = createSignal(false);
   let [infoEdit, setInfoEdit] = createSignal({
@@ -55,7 +52,7 @@ function Setting(props) {
         phone: phone(),
         address: address(),
       };
-      let res = await fetch("api/user", {
+      let res = await fetch("/api/user", {
         method: "PATCH",
         body: JSON.stringify(edit_user_body),
         headers: { "Content-Type": "application/json" },

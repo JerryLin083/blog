@@ -22,7 +22,7 @@ pub fn api_router() -> Router<Pool<Postgres>> {
         .route("/auth/user", get(auth_user));
 
     let post_router = Router::new()
-        .route("/singup", post(signup))
+        .route("/signup", post(signup))
         .route("/login", post(login))
         .route("/posts", post(create_post));
 

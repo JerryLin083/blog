@@ -342,11 +342,11 @@ pub async fn auth_user(
                     .into_iter()
                     .map(|row| User {
                         id: row.get(0),
-                        first_name: row.get(1),
-                        last_name: row.get(2),
-                        email: row.get(3),
-                        phone: row.get(4),
-                        address: row.get(5),
+                        first_name: row.try_get(1).unwrap_or("".into()),
+                        last_name: row.try_get(2).unwrap_or("".into()),
+                        email: row.try_get(3).unwrap_or("".into()),
+                        phone: row.try_get(4).unwrap_or("".into()),
+                        address: row.try_get(5).unwrap_or("".into()),
                     })
                     .collect();
 

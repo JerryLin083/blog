@@ -69,7 +69,7 @@ pub async fn signup(
 ) -> Result<Response, (StatusCode, Json<ApiErrorResponse>)> {
     let query_str = r#"
         WITH new_account AS (
-            insert into account(account, password)
+            insert into accounts(account, password)
             values($1, $2)
             returning account_id
         )
