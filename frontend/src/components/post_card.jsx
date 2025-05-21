@@ -20,7 +20,7 @@ function PostCard(props) {
         </div>
         <div class="article">
           <img
-            src={post.user_id % 2 == 0 ? sloth_avatar : avacado_avatar} //TODO: delete after dev
+            src={post.user_id % 2 == 0 ? sloth_avatar : avacado_avatar}
             alt="avatar"
             height="32"
             width="32"
