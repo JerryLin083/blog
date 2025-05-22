@@ -144,16 +144,16 @@
 
 <h2>Demo</h2>
 <p>signup</p>
-<img src="https://github.com/JerryLin083/blog/blob/master/demo/signup.gif" alt="signup" width="400">
+<img src="https://github.com/JerryLin083/blog/blob/master/demo/signup.gif" alt="signup" width="600">
 
 <p>login</p>
-<img src="https://github.com/JerryLin083/blog/blob/master/demo/login.gif" alt="login" width="400">
+<img src="https://github.com/JerryLin083/blog/blob/master/demo/login.gif" alt="login" width="600">
 
 <p>logout</p>
-<img src="https://github.com/JerryLin083/blog/blob/master/demo/logout.gif" alt="logout" width="400">
+<img src="https://github.com/JerryLin083/blog/blob/master/demo/logout.gif" alt="logout" width="600">
 
 <p>user</p>
-<img src="https://github.com/JerryLin083/blog/blob/master/demo/user.gif" alt="user" width="400">
+<img src="https://github.com/JerryLin083/blog/blob/master/demo/user.gif" alt="user" width="600">
 
 <p>post</p>
-<img src="https://github.com/JerryLin083/blog/blob/master/demo/post.gif" alt="post" width="400">
+<img src="https://github.com/JerryLin083/blog/blob/master/demo/post.gif" alt="post" width="600">
