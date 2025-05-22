@@ -59,6 +59,7 @@ function Setting(props) {
       });
 
       if (res.ok) {
+        props.setUser(edit_user_body);
       } else {
         throw new Error(`Failed to patch data: ${res.status}`);
       }

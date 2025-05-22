@@ -50,7 +50,7 @@ function Header() {
           {auth() ? (
             <div class="setting-container">
               {toggle() ? (
-                <Setting toggle={setToggle} user={user()} />
+                <Setting toggle={setToggle} user={user()} setUser={setUser} />
               ) : (
                 <div class="avatar-block" onClick={() => setToggle(!toggle())}>
                   <img
